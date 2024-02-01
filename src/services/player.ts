@@ -1,8 +1,7 @@
-import { toPeerId } from "@/stdlib";
-import Peer, { DataConnection } from "peerjs";
 import { HostMessage } from "./host";
 import { store } from "@/store";
 import { playerActions } from "@/store/player/reducer";
+import { PeerMessage } from "@/types";
 
 export class PlayerService {
 	private static _instancte: PlayerService;
@@ -13,43 +12,54 @@ export class PlayerService {
 		return this._instancte;
 	}
 
-	private peer?: Peer;
-	private connection?: DataConnection;
+	private wsClient?: WebSocket;
 	private userId?: string;
-	private constructor() { }
+	private gamePin?: string;
 
-	public connect(gamePin: string) {
-		this.userId = `user-${Math.floor(Math.random() * 100000)}`;
-		this.peer = new Peer(this.userId);
-		this.peer.on("error", err => console.log("Peer error", err));
-		if (!this.peer) {
-			return;
+	private constructor() {
+		const userId = localStorage.getItem("userId");
+		if (!userId) {
+			const newId = `user:${Math.floor(Math.random() * 100000)}`;
+			localStorage.setItem("userId", newId);
+			this.userId = newId;
+		} else {
+			this.userId = userId;
 		}
-
-		setTimeout(() => {
-			if (!this.peer) {
-				console.error("Peer is not initialized");
-				return;
-			}
-
-			console.log("Connecting", toPeerId(gamePin));
-			const connection = this.peer.connect(
-				toPeerId(gamePin),
-				// { metadata: { userId: this.userId } }
-			);
-			connection.on("iceStateChanged", state => console.log("iceStateChanged", state));
-			connection.on("error", err => console.log("Connection error", err));
-			connection.on("open", () => this.onConnection(connection))
-		}, 1000);
 	}
 
-	private onConnection = (conn: DataConnection) => {
-		console.log("onConnection", conn);
-		this.connection = conn;
-		conn.on("data", (msg: unknown) => this.onMessage(msg as HostMessage));
-		conn.on("close", () => console.log('Connection is closed'));
+	private sendMessage = (type: string, content: unknown) => {
+		if (!this.wsClient) {
+			return;
+		}
+		const message = {
+			userId: this.userId,
+			roomId: this.gamePin,
+			type,
+			content
+		}
+		this.wsClient.send(JSON.stringify(message));
+	}
 
-		this.connection.send({ type: "join", userId: this.userId });
+	public connect(gamePin: string) {
+		this.gamePin = gamePin;
+		this.wsClient = new WebSocket("wss://frosted-garrulous-decision.glitch.me:");
+		// this.wsClient = new WebSocket("ws://localhost:3000");
+		this.wsClient.onopen = () => {
+			this.sendMessage('joinRoom', {});
+		}
+
+		this.wsClient.onmessage = (event) => {
+			const message = JSON.parse(event.data);
+			if (!['roomInfo', 'userJoined', 'message'].includes(message?.type)) {
+				return console.error("Invalid message", message);
+			}
+
+			if (message.type == 'message') {
+				return this.onMessage(message.content);
+			}
+
+			console.log("Unhandled message :)", message);
+		}
 	}
 
 	private onMessage = (message: HostMessage) => {
@@ -61,3 +71,13 @@ export class PlayerService {
 		}
 	}
 }
+
+const ping = (): PeerMessage<'PING', never> => ({
+	type: 'PING',
+	data: {} as never,
+});
+
+type MessageCreators =
+	| typeof ping;
+export type PlayerMessages = ReturnType<MessageCreators>;
+

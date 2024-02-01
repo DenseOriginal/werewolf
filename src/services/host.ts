@@ -1,9 +1,8 @@
-import { toPeerId } from "@/stdlib";
 import { store } from "@/store";
 import { hostActions } from "@/store/host/reducer";
-import Peer, { DataConnection } from "peerjs";
 import { CardId } from "./cards";
 import { PeerMessage } from "@/types";
+import { PlayerMessages } from "./player";
 
 export class HostService {
 	private static _instancte: HostService;
@@ -15,11 +14,26 @@ export class HostService {
 	}
 
 	private gamePin: string;
-	private peer?: Peer;
-	private connections: Record<string, DataConnection> = {};
+	private userId: string;
+	private wsClient?: WebSocket;
+	private users: string[] = [];
 
 	private constructor() {
 		this.gamePin = Math.floor(Math.random() * 100000).toString().padEnd(5, "0");
+		this.userId = `host:${Math.floor(Math.random() * 100000).toString().padEnd(5, "0")}`;
+	}
+
+	private sendMessage = (type: string, content: unknown) => {
+		if (!this.wsClient) {
+			return;
+		}
+		const message = {
+			userId: this.userId,
+			roomId: this.gamePin,
+			type,
+			content
+		}
+		this.wsClient.send(JSON.stringify(message));
 	}
 
 
@@ -28,37 +42,39 @@ export class HostService {
 	}
 
 	public init() {
-		this.peer = new Peer(toPeerId(this.gamePin));
-		this.peer.on("error", err => console.log("Peer error", err));
-		this.peer.on("connection", this.onConnection);
-		this.peer.on("open", id => console.log("Peer open", id));
-
 		store.dispatch(hostActions.setGamePin(this.gamePin));
-	}
+		// this.wsClient = new WebSocket("ws://localhost:3000");
+		this.wsClient = new WebSocket("wss://frosted-garrulous-decision.glitch.me:");
+		this.wsClient.onopen = () => {
+			this.sendMessage('createRoom', {});
+		}
 
-	private onConnection = (conn: DataConnection) => {
-		console.log("onConnection", conn);
-		conn.once("data", (msg) => {
-			if (!isJoinMessage(msg)) {
-				conn.close();
-				console.error("Initial message wasnt 'join'", msg);
-				return;
+		this.wsClient.onmessage = (event) => {
+			const message = JSON.parse(event.data);
+			if (!['roomInfo', 'userJoined', 'message', 'userLeft'].includes(message?.type)) {
+				return console.error("Invalid message", message);
 			}
 
-			this.onUserJoin(conn, msg.userId);
-		})
-		conn.on("open", () => console.log('Connection is open'));
-		conn.on("close", () => console.log('Connection is closed'));
-		conn.on("error", err => console.log('Connection error', err));
+			switch (message.type) {
+				case 'message':
+					return this.onMessage(message.userId, message.content);
+				case 'userJoined':
+					console.log('userJoined', message.userId);
+					this.users.push(message.userId);
+					return store.dispatch(hostActions.setUsers([...this.users]));
+				case 'userLeft':
+					console.log('userLeft', message.userId);
+					
+					this.users = this.users.filter(user => user !== message.userId);
+					return store.dispatch(hostActions.setUsers([...this.users]));
+				default:
+					console.log("Unhandled message :)", message);
+
+			}
+		}
 	}
 
-	private onUserJoin = (conn: DataConnection, userId: string) => {
-		console.log("onUserJoin", conn, userId);
-		conn.on("data", (msg: unknown) => this.onMessage(userId, msg));
-		this.connections[userId] = conn;
-	}
-
-	private onMessage = (userId: string, message: unknown) => {
+	private onMessage = (userId: string, message: PlayerMessages) => {
 		console.log("onMessage", userId, message);
 	}
 
@@ -69,17 +85,9 @@ export class HostService {
 
 	private broadcast = (msg: HostMessage) => {
 		console.log("broadcast", msg);
-		Object.values(this.connections).forEach(conn => conn.send(msg));
+		this.sendMessage('sendMessage', msg);
 	}
 }
-
-const isJoinMessage = (msg: unknown): msg is { type: "join", userId: string } =>
-	!!msg &&
-	typeof msg === "object" &&
-	"type" in msg &&
-	msg.type === "join" &&
-	"userId" in msg &&
-	typeof msg.userId === "string";
 
 const setCard = (card: CardId): PeerMessage<'SET_CARD', { card: CardId }> => ({
 	type: 'SET_CARD',

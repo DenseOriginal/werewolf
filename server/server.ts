@@ -34,7 +34,8 @@ wss.on('connection', (ws: WebSocketClient) => {
 				rooms[roomId].push(ws);
 				broadcastToRoom(roomId, {
 					type: 'roomInfo',
-					users: rooms[roomId].map((client) => client.userId),
+					userId: ws.userId,
+					users: rooms[roomId].map((client) => client.userId).filter(Boolean) as string[] || [],
 				});
 				break;
 
@@ -79,6 +80,8 @@ wss.on('connection', (ws: WebSocketClient) => {
 	});
 
 	ws.on('close', () => {
+		console.log('Client disconnected', { userId: ws.userId, roomId: ws.roomId });
+		
 		if (ws.roomId && ws.userId) {
 			rooms[ws.roomId] = rooms[ws.roomId].filter((client) => client !== ws);
 			broadcastToRoom(ws.roomId, {
@@ -87,12 +90,18 @@ wss.on('connection', (ws: WebSocketClient) => {
 			});
 		}
 	});
+
+	ws.on('error', error => console.log('Error', error))
 });
 
-function broadcastToRoom(roomId: string, data: unknown) {
+function broadcastToRoom(roomId: string, data: { type: string, userId: string | undefined, content?: unknown, users?: string[] }) {
 	const roomClients = rooms[roomId];
 	if (roomClients) {
 		roomClients.forEach((client) => {
+			if (client.userId === data.userId) {
+				return;
+			}
+
 			if (client.readyState === WebSocket.OPEN) {
 				client.send(JSON.stringify(data));
 			}

@@ -7,6 +7,7 @@ export interface ViewState {
 type GamePin = string;
 export interface HostState {
 	gamePin: GamePin;
+	users: string[];
 }
 
 export interface PlayerState {
