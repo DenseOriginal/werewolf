@@ -1,5 +1,5 @@
 import { createServer } from 'http';
-import { WebSocket } from 'ws';
+import WebSocket, { WebSocketServer } from 'ws';
 
 const server = createServer((_req, res) => {
 	res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -7,7 +7,7 @@ const server = createServer((_req, res) => {
 		data: 'Hello World!',
 	}));
 });
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocketServer({ server });
 
 interface WebSocketClient extends WebSocket {
 	userId?: string;
@@ -19,7 +19,10 @@ const rooms: Record<string, WebSocketClient[]> = {};
 wss.on('connection', (ws: WebSocketClient) => {
 	ws.on('message', (message: string) => {
 		const data = JSON.parse(message);
-		const { type, roomId, userId, content } = data;
+		const { type, roomId, userId, content, targetUserId } = data;
+
+		console.log(`Message: ${message}`);
+		
 
 		switch (type) {
 			case 'createRoom':
@@ -60,6 +63,18 @@ wss.on('connection', (ws: WebSocketClient) => {
 					ws.send(JSON.stringify({ type: 'error', message: 'Not in a room or missing user info' }));
 				}
 				break;
+			case 'sendPrivateMessage':
+				if (ws.roomId && ws.userId) {
+
+					sendPrivateMessage(ws.roomId, targetUserId, {
+						type: 'message',
+						userId: ws.userId,
+						content,
+					});
+				} else {
+					ws.send(JSON.stringify({ type: 'error', message: 'Not in a room or missing user info' }));
+				}
+				break;
 		}
 	});
 
@@ -82,6 +97,16 @@ function broadcastToRoom(roomId: string, data: unknown) {
 				client.send(JSON.stringify(data));
 			}
 		});
+	}
+}
+
+function sendPrivateMessage(roomId: string, userId: string, data: unknown) {
+	const roomClients = rooms[roomId];
+	const client = roomClients.find((client) => client.userId === userId);
+	if (client) {
+		if (client.readyState === WebSocket.OPEN) {
+			client.send(JSON.stringify(data));
+		}
 	}
 }
 

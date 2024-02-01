@@ -1,10 +1,11 @@
 {
 	"compilerOptions": {
 		"target": "ES2018",
-		"module": "commonjs",
-		"outDir": "./server",
+		"outDir": "./server-dist",
 		"rootDir": "./server",
 		"strict": true,
-		"esModuleInterop": true
-	}
+		"esModuleInterop": true,
+		"moduleResolution": "Node"
+	},
+	"include": ["server"]
 }
