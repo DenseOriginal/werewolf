@@ -14,8 +14,25 @@ const hostSlice = createSlice({
 		setGamePin: (state, action: PayloadAction<GamePin>) => {
 			state.gamePin = action.payload;
 		},
-		setUsers: (state, action: PayloadAction<string[]>) => {
-			state.users = action.payload;
+		addUser: (state, action: PayloadAction<string>) => {
+			// If the user is already in the list, update their status
+			const user = state.users.find(user => user.userId === action.payload);
+			if (user) {
+				user.active = true;
+				return;
+			}
+
+			// Otherwise, add a new user
+			state.users.push({
+				userId: action.payload,
+				active: true
+			});
+		},
+		updateUserStatus: (state, action: PayloadAction<{ userId: string, active: boolean }>) => {
+			const user = state.users.find(user => user.userId === action.payload.userId);
+			if (user) {
+				user.active = action.payload.active;
+			}
 		},
 		setLoading: (state, action: PayloadAction<boolean>) => {
 			state.loading = action.payload;

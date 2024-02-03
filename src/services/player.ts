@@ -43,7 +43,8 @@ export class PlayerService {
 	public connect(gamePin: string) {
 		this.gamePin = gamePin;
 		// this.wsClient = new WebSocket("wss://frosted-garrulous-decision.glitch.me:");
-		this.wsClient = new WebSocket("ws://localhost:3000");
+		this.wsClient = new WebSocket("ws://192.168.8.146:3000");
+		// this.wsClient = new WebSocket("ws://localhost:3000");
 		this.wsClient.onopen = () => {
 			this.sendMessage('joinRoom', {});
 		}

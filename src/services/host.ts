@@ -16,7 +16,6 @@ export class HostService {
 	private gamePin: string;
 	private userId: string;
 	private wsClient?: WebSocket;
-	private users: string[] = [];
 
 	private constructor() {
 		this.gamePin = Math.floor(Math.random() * 100000).toString().padEnd(5, "0");
@@ -45,7 +44,8 @@ export class HostService {
 		store.dispatch(hostActions.setLoading(true));
 		store.dispatch(hostActions.setGamePin(this.gamePin));
 
-		this.wsClient = new WebSocket("ws://localhost:3000");
+		this.wsClient = new WebSocket("ws://192.168.8.146:3000");
+		// this.wsClient = new WebSocket("ws://localhost:3000");
 		// this.wsClient = new WebSocket("wss://frosted-garrulous-decision.glitch.me:");
 		this.wsClient.onopen = () => {
 			this.sendMessage('createRoom', {});
@@ -62,13 +62,13 @@ export class HostService {
 					return this.onMessage(message.userId, message.content);
 				case 'userJoined':
 					console.log('userJoined', message.userId);
-					this.users.push(message.userId);
-					return store.dispatch(hostActions.setUsers([...this.users]));
+					return store.dispatch(hostActions.addUser(message.userId));
 				case 'userLeft':
 					console.log('userLeft', message.userId);
-					
-					this.users = this.users.filter(user => user !== message.userId);
-					return store.dispatch(hostActions.setUsers([...this.users]));
+					return store.dispatch(hostActions.updateUserStatus({
+						userId: message.userId,
+						active: false
+					}));
 
 				case 'roomCreated':
 					console.log('roomCreated', message);

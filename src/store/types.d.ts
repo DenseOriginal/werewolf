@@ -1,4 +1,5 @@
 import { CardId } from "@/services/cards";
+import { User } from "@/types";
 
 export interface ViewState {
 	view: 'home' | 'host' | 'player';
@@ -7,7 +8,7 @@ export interface ViewState {
 type GamePin = string;
 export interface HostState {
 	gamePin: GamePin;
-	users: string[];
+	users: User[];
 	loading: boolean;
 }
 

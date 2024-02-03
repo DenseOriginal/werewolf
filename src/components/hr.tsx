@@ -3,6 +3,7 @@ import { classNames } from "../stdlib/layout";
 
 interface Props {
 	className?: string;
+	leftAligned?: boolean;
 }
 
 export const Hr = (props: PropsWithChildren<Props>) => (
@@ -12,8 +13,8 @@ export const Hr = (props: PropsWithChildren<Props>) => (
 			props.className
 		)}
 	>
-		<div className="basis-1/2 shrink h-0.5 bg-white noisy"></div>
+		{!props.leftAligned && <div className="basis-1/2 shrink h-0.5 bg-white noisy"></div>}
 		{props.children}
-		<div className="basis-1/2 shrink h-0.5 bg-white noisy"></div>
+		<div className="basis-1/2 grow h-0.5 bg-white noisy"></div>
 	</div>
 )
