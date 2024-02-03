@@ -26,8 +26,7 @@ export const Select = <T,>(props: Props<T>) => {
 	const onSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
 		const option = internalOptions.find(option => option.value === value);
-		console.log({ value, option, internalOptions });
-		
+
 		if (option) {
 			props.onSelect(option.data);
 		}
