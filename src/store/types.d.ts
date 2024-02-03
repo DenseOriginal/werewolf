@@ -9,9 +9,10 @@ type GamePin = string;
 export interface HostState {
 	gamePin: GamePin;
 	users: User[];
-	loading: boolean;
+	state: 'creating' | 'settings' | 'playing';
 	game: {
 		cards: Partial<Record<CardId, number>>;
+		userCards: Record<string, CardId>;
 	}
 }
 

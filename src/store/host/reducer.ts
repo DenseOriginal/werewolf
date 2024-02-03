@@ -5,9 +5,10 @@ import { CardId } from "@/services/cards";
 const initialState: HostState = {
 	gamePin: '',
 	users: [],
-	loading: false,
+	state: 'creating',
 	game: {
-		cards: {}
+		cards: {},
+		userCards: {}
 	}
 }
 
@@ -38,8 +39,8 @@ const hostSlice = createSlice({
 				user.active = action.payload.active;
 			}
 		},
-		setLoading: (state, action: PayloadAction<boolean>) => {
-			state.loading = action.payload;
+		setState: (state, action: PayloadAction<HostState['state']>) => {
+			state.state = action.payload;
 		},
 		setCardCount: (state, action: PayloadAction<{ cardId: CardId, count: number }>) => {
 			state.game.cards[action.payload.cardId] = Math.max(0, action.payload.count);
@@ -49,6 +50,9 @@ const hostSlice = createSlice({
 		},
 		removeCard: (state, action: PayloadAction<CardId>) => {
 			delete state.game.cards[action.payload];
+		},
+		setUserCards: (state, action: PayloadAction<HostState['game']['userCards']>) => {
+			state.game.userCards = action.payload;
 		}
 	}
 })

@@ -23,7 +23,7 @@ export class HostService {
 		this.userId = `host:${Math.floor(Math.random() * 100000).toString().padEnd(5, "0")}`;
 	}
 
-	private sendMessage = (type: string, content: unknown) => {
+	private sendMessage = (type: string, content: unknown, extra = {}) => {
 		if (!this.wsClient) {
 			return;
 		}
@@ -31,7 +31,8 @@ export class HostService {
 			userId: this.userId,
 			roomId: this.gamePin,
 			type,
-			content
+			content,
+			...extra,
 		}
 		this.wsClient.send(JSON.stringify(message));
 	}
@@ -42,7 +43,7 @@ export class HostService {
 	}
 
 	public init() {
-		store.dispatch(hostActions.setLoading(true));
+		store.dispatch(hostActions.setState('creating'));
 		store.dispatch(hostActions.setGamePin(this.gamePin));
 
 		this.wsClient = getWsClient();
@@ -71,7 +72,7 @@ export class HostService {
 
 				case 'roomCreated':
 					console.log('roomCreated', message);
-					store.dispatch(hostActions.setLoading(false));
+					store.dispatch(hostActions.setState('settings'));
 					break;
 
 				default:
@@ -85,14 +86,24 @@ export class HostService {
 		console.log("onMessage", userId, message);
 	}
 
-	public startGame = () => {
-		console.log("startGame");
-		this.broadcast(setCard('werewolf'));
+	// Send selected cards to users, Record<UserId, CardId>
+	public startGame = (config: Record<string, CardId>) => {
+		console.log("startGame", config);
+		Object.entries(config).forEach(([userId, card]) => this.sendToUser(userId, setCard(card)));
 	}
 
 	private broadcast = (msg: HostMessage) => {
 		console.log("broadcast", msg);
 		this.sendMessage('sendMessage', msg);
+	}
+	
+	private sendToUser = (userId: string, msg: HostMessage) => {
+		console.log("sendToUser", userId, msg);
+		this.sendMessage(
+			'sendPrivateMessage',
+			msg,
+			{ targetUserId: userId }
+		);
 	}
 }
 
