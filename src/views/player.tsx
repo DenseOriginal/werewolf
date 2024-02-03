@@ -16,7 +16,7 @@ export const PlayerView = () => {
 				'absolute top-0 left-4',
 			)}
 		>{gamePin}</span>
-		<div className="w-[300px] h-[440px] relative">
+		<div className="w-[300px] h-[415px] relative">
 			<Placeholder hide={card != 'unknown'} />
 			{card != 'unknown' && <Card card={card} /> }
 		</div>

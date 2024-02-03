@@ -20,4 +20,8 @@ export const Cards = {
 	villager
 }
 
+export const getCard = (id: string) => {
+	return Cards[id as keyof typeof Cards];
+}
+
 export type CardId = (typeof Cards)[keyof typeof Cards]['id'];

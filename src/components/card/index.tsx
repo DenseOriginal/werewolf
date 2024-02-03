@@ -1,7 +1,8 @@
 import { CardId } from "@/services/cards"
 import "./card.css";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { classNames } from "@/stdlib/layout";
+import { getCard } from "@/services/cards/list";
 
 interface Props {
 	card: CardId;
@@ -10,6 +11,7 @@ interface Props {
 export const Card = (props: Props) => {
 	const [isStable, setIsStable] = useState(false);
 	const [open, setOpen] = useState(false);
+	const card = useMemo(() => getCard(props.card), [props.card]);
 	
 	return (
 		<div
@@ -26,7 +28,8 @@ export const Card = (props: Props) => {
 		>
 			<div className="front"></div>
 			<div className="back">
-				<img src="/src/assets/werewolf.png" alt="" />
+				<h1 className="text-black text-3xl">{card.name}</h1>
+				{/* <img src="/src/assets/werewolf.png" alt="" /> */}
 			</div>
 		</div>
 	)
