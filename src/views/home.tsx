@@ -11,7 +11,7 @@ export const HomeView = () => {
 		dispatch(hostGame());	
 	}
 	
-	return <>
+	return <div className="p-3">
 		<h1 className="text-xl my-8">Werewolf</h1>
 
 		<div className="flex flex-col gap-2 w-full">
@@ -22,5 +22,5 @@ export const HomeView = () => {
 		<div className="flex gap-2 w-full">
 			<Button className="w-full" onClick={host}>Host game</Button>
 		</div>
-	</>
+	</div>
 }

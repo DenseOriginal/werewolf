@@ -8,7 +8,7 @@ export const PlayerView = () => {
 		card: state.player.card,
 	}));
 
-	return <div className="flex flex-col justify-center items-center h-full">
+	return <div className="flex flex-col justify-center items-center h-full p-3">
 		<span
 			className={classNames(
 				'bg-yellow-200 noisy',

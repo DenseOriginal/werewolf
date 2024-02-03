@@ -10,6 +10,9 @@ export interface HostState {
 	gamePin: GamePin;
 	users: User[];
 	loading: boolean;
+	game: {
+		cards: Partial<Record<CardId, number>>;
+	}
 }
 
 export interface PlayerState {
