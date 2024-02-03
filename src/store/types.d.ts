@@ -8,6 +8,7 @@ type GamePin = string;
 export interface HostState {
 	gamePin: GamePin;
 	users: string[];
+	loading: boolean;
 }
 
 export interface PlayerState {

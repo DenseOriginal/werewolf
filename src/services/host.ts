@@ -42,16 +42,18 @@ export class HostService {
 	}
 
 	public init() {
+		store.dispatch(hostActions.setLoading(true));
 		store.dispatch(hostActions.setGamePin(this.gamePin));
-		// this.wsClient = new WebSocket("ws://localhost:3000");
-		this.wsClient = new WebSocket("wss://frosted-garrulous-decision.glitch.me:");
+
+		this.wsClient = new WebSocket("ws://localhost:3000");
+		// this.wsClient = new WebSocket("wss://frosted-garrulous-decision.glitch.me:");
 		this.wsClient.onopen = () => {
 			this.sendMessage('createRoom', {});
 		}
 
 		this.wsClient.onmessage = (event) => {
 			const message = JSON.parse(event.data);
-			if (!['roomInfo', 'userJoined', 'message', 'userLeft'].includes(message?.type)) {
+			if (!['roomCreated', 'userJoined', 'message', 'userLeft'].includes(message?.type)) {
 				return console.error("Invalid message", message);
 			}
 
@@ -67,6 +69,12 @@ export class HostService {
 					
 					this.users = this.users.filter(user => user !== message.userId);
 					return store.dispatch(hostActions.setUsers([...this.users]));
+
+				case 'roomCreated':
+					console.log('roomCreated', message);
+					store.dispatch(hostActions.setLoading(false));
+					break;
+
 				default:
 					console.log("Unhandled message :)", message);
 

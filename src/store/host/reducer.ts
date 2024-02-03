@@ -3,7 +3,8 @@ import { GamePin, HostState } from "../types";
 
 const initialState: HostState = {
 	gamePin: '',
-	users: []
+	users: [],
+	loading: false,
 }
 
 const hostSlice = createSlice({
@@ -16,6 +17,9 @@ const hostSlice = createSlice({
 		setUsers: (state, action: PayloadAction<string[]>) => {
 			state.users = action.payload;
 		},
+		setLoading: (state, action: PayloadAction<boolean>) => {
+			state.loading = action.payload;
+		}
 	}
 })
 

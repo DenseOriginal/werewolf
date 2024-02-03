@@ -32,11 +32,7 @@ wss.on('connection', (ws: WebSocketClient) => {
 				ws.roomId = roomId;
 				ws.userId = userId;
 				rooms[roomId].push(ws);
-				broadcastToRoom(roomId, {
-					type: 'roomInfo',
-					userId: ws.userId,
-					users: rooms[roomId].map((client) => client.userId).filter(Boolean) as string[] || [],
-				});
+				ws.send(JSON.stringify({ type: 'roomCreated', roomId }))
 				break;
 
 			case 'joinRoom':
