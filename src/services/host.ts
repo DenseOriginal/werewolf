@@ -3,6 +3,7 @@ import { hostActions } from "@/store/host/reducer";
 import { CardId } from "./cards";
 import { PeerMessage } from "@/types";
 import { PlayerMessages } from "./player";
+import { getWsClient } from "./ws";
 
 export class HostService {
 	private static _instancte: HostService;
@@ -44,9 +45,7 @@ export class HostService {
 		store.dispatch(hostActions.setLoading(true));
 		store.dispatch(hostActions.setGamePin(this.gamePin));
 
-		this.wsClient = new WebSocket("ws://192.168.8.146:3000");
-		// this.wsClient = new WebSocket("ws://localhost:3000");
-		// this.wsClient = new WebSocket("wss://frosted-garrulous-decision.glitch.me:");
+		this.wsClient = getWsClient();
 		this.wsClient.onopen = () => {
 			this.sendMessage('createRoom', {});
 		}
