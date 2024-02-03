@@ -1,6 +1,6 @@
 import { useSelector } from "./store"
 import { HomeView } from "./views/home"
-import { HostView } from "./views/host/host";
+import { HostView } from "./views/host";
 import { PlayerView } from "./views/player";
 
 function App() {

@@ -16,8 +16,14 @@ export const startGame = () => async (dispatch: ThunkDispatch, getState: () => S
 	const { game: { cards: settings }, users } = hostState;
 	const cardArray = Object.entries(settings).flatMap(([cardId, count]) => Array(count).fill(cardId) as CardId[]);
 	const shuffledCards = shuffleArray(cardArray);
-	const dealtCards = users
-		.filter(user => user.active)
+	const activeUsers = users.filter(user => user.active);
+
+	if (shuffledCards.length < activeUsers.length) {
+		console.error("Not enough cards for all active users");
+		return;
+	}
+
+	const dealtCards = activeUsers
 		.reduce((acc, user, idx) => ({
 			...acc,
 			[user.userId]: shuffledCards[idx % shuffledCards.length]
@@ -27,4 +33,10 @@ export const startGame = () => async (dispatch: ThunkDispatch, getState: () => S
 	
 	dispatch(hostActions.setState('playing'));
 	dispatch(hostActions.setUserCards(dealtCards));
+}
+
+export const resetGame = () => async (dispatch: ThunkDispatch) => {
+	HostService.instance.resetGame();
+	dispatch(hostActions.setState('settings'));
+	dispatch(hostActions.setUserCards({}));
 }

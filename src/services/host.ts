@@ -92,6 +92,11 @@ export class HostService {
 		Object.entries(config).forEach(([userId, card]) => this.sendToUser(userId, setCard(card)));
 	}
 
+	public resetGame = () => {
+		console.log("resetGame");
+		this.broadcast(resetGame());
+	}
+
 	private broadcast = (msg: HostMessage) => {
 		console.log("broadcast", msg);
 		this.sendMessage('sendMessage', msg);
@@ -112,6 +117,12 @@ const setCard = (card: CardId): PeerMessage<'SET_CARD', { card: CardId }> => ({
 	data: { card },
 });
 
+const resetGame = (): PeerMessage<'RESET_GAME', never> => ({
+	type: 'RESET_GAME',
+	data: {} as never,
+});
+
 type MessageCreators =
-	| typeof setCard;
+	| typeof setCard
+	| typeof resetGame;
 export type HostMessage = ReturnType<MessageCreators>;

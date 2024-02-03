@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "@/store"
 import { Users } from "./users";
 import { Settings } from "./settings";
 import { startGame } from "@/store/host/thunks";
+import { PlayingView } from "./playing";
 
 export const HostView = () => {
 	const state = useSelector(state => state.host.state);
@@ -12,11 +13,12 @@ export const HostView = () => {
 		switch (state) {
 			case 'settings': return <SettingsView />;
 			case 'creating': return <LoadingView />;
-			default: return <p>{":("}</p>
+			case 'playing': return <PlayingView />;
+			default: return <p>{"You should be here :("}  {state}</p>
 		}
 	}
 
-	return getView();
+	return <div className="h-full w-full overflow-y-auto p-3">{getView()}</div>;
 }
 
 const SettingsView = () => {
@@ -28,7 +30,7 @@ const SettingsView = () => {
 	}
 
 	return (
-		<div className="flex flex-col items-stretch h-full w-full overflow-y-auto p-3">
+		<div className="flex flex-col items-stretch h-full">
 			<h1 className="text-xl text-center mb-5">Game pin: {gamePin}</h1>
 
 			<Users />

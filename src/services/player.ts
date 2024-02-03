@@ -67,7 +67,9 @@ export class PlayerService {
 
 		switch (message?.type) {
 			case 'SET_CARD':
-				store.dispatch(playerActions.setCard(message.data.card));
+				return store.dispatch(playerActions.setCard(message.data.card));
+			case 'RESET_GAME':
+				return store.dispatch(playerActions.resetGame());
 		}
 	}
 }

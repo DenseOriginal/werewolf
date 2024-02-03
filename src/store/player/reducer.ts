@@ -17,6 +17,9 @@ const playeSlice = createSlice({
 		setCard: (state, action: PayloadAction<PlayerState['card']>) => {
 			state.card = action.payload;
 		},
+		resetGame: (state) => {
+			state.card = 'unknown';
+		}
 	},
 	
 })
