@@ -5,10 +5,8 @@ import { useSelector } from "@/store"
 
 export const PlayerView = () => {
 	const playerState = useSelector(state => state.player.state);
-	const { gamePin, card } = useSelector(state => ({
-		gamePin: state.player.gamePin,
-		card: state.player.card,
-	}));
+	const gamePin = useSelector(state => state.player.gamePin);
+	const card = useSelector(state => state.player.card);
 
 	return playerState == 'playing' ? (
 		<div className="flex flex-col justify-center items-center h-full p-3">
