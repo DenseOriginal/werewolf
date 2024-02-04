@@ -17,7 +17,7 @@ export interface HostState {
 }
 
 export interface PlayerState {
-	loading: boolean;
+	state: 'joining' | 'playing';
 	gamePin: GamePin;
 	card: 'unknown' | CardId;
 }

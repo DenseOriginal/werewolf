@@ -62,6 +62,7 @@ export class HostService {
 					return this.onMessage(message.userId, message.content);
 				case 'userJoined':
 					console.log('userJoined', message.userId);
+					this.sendToUser(message.userId, welcomeUser(message.userId));
 					return store.dispatch(hostActions.addUser({ name: message.name, userId: message.userId }));
 				case 'userLeft':
 					console.log('userLeft', message.userId);
@@ -122,7 +123,13 @@ const resetGame = (): PeerMessage<'RESET_GAME', never> => ({
 	data: {} as never,
 });
 
+const welcomeUser = (userId: string): PeerMessage<'WELCOME', { userId: string }> => ({
+	type: 'WELCOME',
+	data: { userId },
+});
+
 type MessageCreators =
 	| typeof setCard
-	| typeof resetGame;
+	| typeof resetGame
+	| typeof welcomeUser;
 export type HostMessage = ReturnType<MessageCreators>;

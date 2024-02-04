@@ -46,7 +46,7 @@ wss.on('connection', (ws: WebSocketClient) => {
 						name: content.name,
 					});
 				} else {
-					ws.send(JSON.stringify({ type: 'error', message: 'Room does not exist' }));
+					ws.send(JSON.stringify({ type: 'unknownRoom' }));
 				}
 				break;
 

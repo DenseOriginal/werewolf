@@ -3,6 +3,8 @@ import { store } from "@/store";
 import { playerActions } from "@/store/player/reducer";
 import { PeerMessage } from "@/types";
 import { getWsClient } from "./ws";
+import { viewActions } from "@/store/reducer";
+import { Toastr } from "./toastr";
 
 interface UserSettings {
 	userId: string;
@@ -10,12 +12,15 @@ interface UserSettings {
 }
 
 export class PlayerService {
-	private static _instancte: PlayerService;
+	private static _instance?: PlayerService;
 	public static get instance(): PlayerService {
-		if (!this._instancte) {
-			this._instancte = new PlayerService();
+		if (!this._instance) {
+			this._instance = new PlayerService();
 		}
-		return this._instancte;
+		return this._instance;
+	}
+	public static destroy() {
+		this._instance = undefined;
 	}
 
 	private wsClient?: WebSocket;
@@ -55,6 +60,9 @@ export class PlayerService {
 
 	public connect(gamePin: string) {
 		this.gamePin = gamePin;
+
+		store.dispatch(playerActions.setState('joining'));
+
 		this.wsClient = getWsClient();
 		this.wsClient.onopen = () => {
 			this.sendMessage('joinRoom', { name: this.settings.name });
@@ -62,15 +70,23 @@ export class PlayerService {
 
 		this.wsClient.onmessage = (event) => {
 			const message = JSON.parse(event.data);
-			if (!['roomInfo', 'userJoined', 'message'].includes(message?.type)) {
+			if (!['roomInfo', 'userJoined', 'message', 'unknownRoom'].includes(message?.type)) {
 				return console.error("Invalid message", message);
 			}
 
-			if (message.type == 'message') {
-				return this.onMessage(message.content);
+			switch (message.type) {
+				case 'message':
+					return this.onMessage(message.content);
+				case 'unknownRoom':
+					store.dispatch(viewActions.setView('home'));
+					Toastr.error("Unknown room", "The room you are trying to join does not exist");
+					return PlayerService.destroy();
+					
+				default:
+					console.log("Unhandled message :)", message);
+					break;
 			}
 
-			console.log("Unhandled message :)", message);
 		}
 	}
 
@@ -82,6 +98,10 @@ export class PlayerService {
 				return store.dispatch(playerActions.setCard(message.data.card));
 			case 'RESET_GAME':
 				return store.dispatch(playerActions.resetGame());
+			case 'WELCOME':
+				if (message.data.userId == this.settings.userId) {
+					return store.dispatch(playerActions.setState('playing'));
+				}
 		}
 	}
 }

@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { PlayerState } from "../types";
 
 const initialState: PlayerState = {
-	loading: false,
+	state: 'joining',
 	gamePin: '',
 	card: 'unknown'
 }
@@ -19,6 +19,9 @@ const playeSlice = createSlice({
 		},
 		resetGame: (state) => {
 			state.card = 'unknown';
+		},
+		setState: (state, action: PayloadAction<PlayerState['state']>) => {
+			state.state = action.payload;
 		}
 	},
 	

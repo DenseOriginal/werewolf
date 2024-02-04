@@ -8,6 +8,15 @@ export default {
 		extend: {
 			fontFamily: {
 				"nova-cut": ['Nova Cut', 'system-ui']
+			},
+			animation: {
+				'fade-out': "fadeOut liniar infinite"
+			},
+			keyframes: {
+				fadeOut: {
+					'0%': { opacity: '100' },
+					'100%': { opacity: '0' }
+				}
 			}
 		},
 		fontSize: {
