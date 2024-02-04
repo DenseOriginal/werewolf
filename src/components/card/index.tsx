@@ -27,8 +27,9 @@ export const Card = (props: Props) => {
 			role="button"
 		>
 			<div className="front"></div>
-			<div className="back">
-				<h1 className="text-black text-3xl">{card.name}</h1>
+			<div className="back flex flex-col justify-center items-center text-black p-2">
+				<h1 className="text-3xl text-center">{card.name}</h1>
+				<p className="text-center">{card.description}</p>
 				{/* <img src="/src/assets/werewolf.png" alt="" /> */}
 			</div>
 		</div>
