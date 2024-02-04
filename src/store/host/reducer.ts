@@ -36,6 +36,13 @@ const hostSlice = createSlice({
 				active: true
 			});
 		},
+		setUsers: (state, action: PayloadAction<string[]>) => {
+			state.users = action.payload.map(userId => ({
+				userId,
+				name: '',
+				active: true
+			}));
+		},
 		updateUserStatus: (state, action: PayloadAction<{ userId: string, active: boolean }>) => {
 			const user = state.users.find(user => user.userId === action.payload.userId);
 			if (user) {
@@ -56,9 +63,13 @@ const hostSlice = createSlice({
 		},
 		setUserCards: (state, action: PayloadAction<HostState['game']['userCards']>) => {
 			state.game.userCards = action.payload;
+		},
+		loadStateFromStorage: (state, action: PayloadAction<HostState>) => {
+			Object.assign(state, action.payload);
 		}
 	}
 })
 
 export const hostActions = hostSlice.actions;
 export const hostReducer = hostSlice.reducer;
+export const hostInitialState = initialState;

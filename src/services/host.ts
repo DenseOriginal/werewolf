@@ -1,9 +1,10 @@
 import { store } from "@/store";
-import { hostActions } from "@/store/host/reducer";
+import { hostActions, hostInitialState } from "@/store/host/reducer";
 import { CardId } from "./cards";
 import { PeerMessage } from "@/types";
 import { PlayerMessages } from "./player";
 import { getWsClient } from "./ws";
+import { HostState } from "@/store/types";
 
 export class HostService {
 	private static _instancte: HostService;
@@ -21,6 +22,11 @@ export class HostService {
 	private constructor() {
 		this.gamePin = Math.floor(Math.random() * 100000).toString().padEnd(5, "0");
 		this.userId = `host:${Math.floor(Math.random() * 100000).toString().padEnd(5, "0")}`;
+
+		store.subscribe(() => {
+			const state = store.getState().host;
+			localStorage.setItem('hostSettings', JSON.stringify(state));
+		})
 	}
 
 	private sendMessage = (type: string, content: unknown, extra = {}) => {
@@ -51,11 +57,37 @@ export class HostService {
 			this.sendMessage('createRoom', {});
 		}
 
+		this.setupWsClient();
+	}
+
+	public rejoin() {
+
+	}
+
+	private loadSettings = () => {
+		const rawSettings = localStorage.getItem('hostSettings') || '{}';
+		const settings = JSON.parse(rawSettings) as Partial<HostState> | undefined;
+
+		const patchedSettings: HostState = {
+			...hostInitialState,
+			gamePin: settings?.gamePin || this.gamePin,
+			users: settings?.users || [],
+			game: {
+				cards: settings?.game?.cards || {},
+				userCards: settings?.game?.userCards || {},
+			}
+		}
+
+		return patchedSettings;
+	}
+
+	private setupWsClient = () => {
+		if (!this.wsClient) {
+			return;
+		}
+
 		this.wsClient.onmessage = (event) => {
 			const message = JSON.parse(event.data);
-			if (!['roomCreated', 'userJoined', 'message', 'userLeft'].includes(message?.type)) {
-				return console.error("Invalid message", message);
-			}
 
 			switch (message.type) {
 				case 'message':
@@ -76,9 +108,15 @@ export class HostService {
 					store.dispatch(hostActions.setState('settings'));
 					break;
 
-				default:
-					console.log("Unhandled message :)", message);
+				case 'rejoined':
+					console.log('Rejoined as host', message);
+					store.dispatch(hostActions.setState('settings'));
+					store.dispatch(hostActions.loadStateFromStorage(this.loadSettings()));
+					store.dispatch(hostActions.setUsers(message.users));
+					break;
 
+				default:
+					return console.error("Invalid message", message);
 			}
 		}
 	}
@@ -102,7 +140,7 @@ export class HostService {
 		console.log("broadcast", msg);
 		this.sendMessage('sendMessage', msg);
 	}
-	
+
 	private sendToUser = (userId: string, msg: HostMessage) => {
 		console.log("sendToUser", userId, msg);
 		this.sendMessage(

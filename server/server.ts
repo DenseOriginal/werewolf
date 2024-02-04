@@ -15,24 +15,40 @@ interface WebSocketClient extends WebSocket {
 }
 
 const rooms: Record<string, WebSocketClient[]> = {};
+const roomHostKeys: Record<string, string> = {};
 
 wss.on('connection', (ws: WebSocketClient) => {
 	ws.on('message', (message: string) => {
 		const data = JSON.parse(message);
-		const { type, roomId, userId, content, targetUserId } = data;
+		const { type, roomId, userId, content, targetUserId, hostKey } = data;
 
 		console.log(`Message: ${message}`);
 		
 
 		switch (type) {
 			case 'createRoom':
-				if (!rooms[roomId]) {
-					rooms[roomId] = [];
+				if (rooms[roomId]) {
+					ws.send(JSON.stringify({ type: 'error', message: 'Room already exists' }))
 				}
+				rooms[roomId] = [];
+
+				roomHostKeys[roomId] = Math.random().toString(36).substring(2);
+
 				ws.roomId = roomId;
 				ws.userId = userId;
 				rooms[roomId].push(ws);
 				ws.send(JSON.stringify({ type: 'roomCreated', roomId }))
+				break;
+
+			case 'rejoinAsHost':
+				if (roomHostKeys[roomId] === hostKey) {
+					ws.roomId = roomId;
+					ws.userId = userId;
+					ws.send(JSON.stringify({ type: 'rejoined', users: rooms[roomId].map((client) => client.userId) }));
+					rooms[roomId].push(ws);
+				} else {
+					ws.send(JSON.stringify({ type: 'error', message: 'Invalid host key' }));
+				}
 				break;
 
 			case 'joinRoom':
