@@ -62,7 +62,7 @@ export class HostService {
 					return this.onMessage(message.userId, message.content);
 				case 'userJoined':
 					console.log('userJoined', message.userId);
-					return store.dispatch(hostActions.addUser(message.userId));
+					return store.dispatch(hostActions.addUser({ name: message.name, userId: message.userId }));
 				case 'userLeft':
 					console.log('userLeft', message.userId);
 					return store.dispatch(hostActions.updateUserStatus({

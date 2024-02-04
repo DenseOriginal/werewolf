@@ -37,7 +37,7 @@ export const CodeInput = () => {
 
 		return <div
 			className={classNames(
-				"bg-yellow-100 p-3 rounded box-content w-[1ch]",
+				"bg-yellow-100 p-3 rounded box-content min-w-[1ch] grow grid place-items-center",
 				!hasValue && "text-opacity-20",
 				"text-gray-950",
 				"border-amber-400 border-2 noisy",
@@ -59,7 +59,7 @@ export const CodeInput = () => {
 			ref={containerRef}
 			className="group"
 		>
-			<div className="flex justify-between text-3xl">
+			<div className="flex justify-between text-3xl gap-2">
 				{Array.from({ length: codeLength }, (_, i) => <Number key={i} idx={i} />)}
 			</div>
 			<input

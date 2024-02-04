@@ -7,5 +7,6 @@ export interface PeerMessage<Type extends string, Data extends object> {
 
 export interface User {
 	userId: string;
+	name: string;
 	active: boolean;
 }

@@ -4,6 +4,11 @@ import { playerActions } from "@/store/player/reducer";
 import { PeerMessage } from "@/types";
 import { getWsClient } from "./ws";
 
+interface UserSettings {
+	userId: string;
+	name: string;
+}
+
 export class PlayerService {
 	private static _instancte: PlayerService;
 	public static get instance(): PlayerService {
@@ -14,18 +19,25 @@ export class PlayerService {
 	}
 
 	private wsClient?: WebSocket;
-	private userId?: string;
 	private gamePin?: string;
+	private settings: UserSettings;
 
 	private constructor() {
-		const userId = localStorage.getItem("userId");
-		if (!userId) {
-			const newId = `user:${Math.floor(Math.random() * 100000)}`;
-			localStorage.setItem("userId", newId);
-			this.userId = newId;
-		} else {
-			this.userId = userId;
+		this.settings = this.getUserSettings();
+	}
+
+	private getUserSettings = () => {
+		const rawSettings = localStorage.getItem("userSettings") || "{}";
+		const settings: Partial<UserSettings> = JSON.parse(rawSettings);
+
+		const patchedSettings: UserSettings = {
+			userId: `user:${Math.floor(Math.random() * 100000)}`,
+			name: settings.name || fixedPrompt("Please enter your name"),
+			...settings,
 		}
+
+		localStorage.setItem("userSettings", JSON.stringify(patchedSettings));
+		return patchedSettings;
 	}
 
 	private sendMessage = (type: string, content: unknown) => {
@@ -33,7 +45,7 @@ export class PlayerService {
 			return;
 		}
 		const message = {
-			userId: this.userId,
+			userId: this.settings.userId,
 			roomId: this.gamePin,
 			type,
 			content
@@ -45,7 +57,7 @@ export class PlayerService {
 		this.gamePin = gamePin;
 		this.wsClient = getWsClient();
 		this.wsClient.onopen = () => {
-			this.sendMessage('joinRoom', {});
+			this.sendMessage('joinRoom', { name: this.settings.name });
 		}
 
 		this.wsClient.onmessage = (event) => {
@@ -83,3 +95,12 @@ type MessageCreators =
 	| typeof ping;
 export type PlayerMessages = ReturnType<MessageCreators>;
 
+const fixedPrompt = (message: string) => {
+	let response = prompt(message);
+
+	while (!response) {
+		response = prompt(message);
+	}
+
+	return response;
+}

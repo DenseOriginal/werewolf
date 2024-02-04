@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { GamePin, HostState } from "../types";
 import { CardId } from "@/services/cards";
+import { User } from "@/types";
 
 const initialState: HostState = {
 	gamePin: '',
@@ -19,17 +20,19 @@ const hostSlice = createSlice({
 		setGamePin: (state, action: PayloadAction<GamePin>) => {
 			state.gamePin = action.payload;
 		},
-		addUser: (state, action: PayloadAction<string>) => {
+		addUser: (state, action: PayloadAction<Omit<User, 'active'>>) => {
 			// If the user is already in the list, update their status
-			const user = state.users.find(user => user.userId === action.payload);
+			const user = state.users.find(user => user.userId === action.payload.userId);
 			if (user) {
 				user.active = true;
+				user.name = action.payload.name;
 				return;
 			}
 
 			// Otherwise, add a new user
 			state.users.push({
-				userId: action.payload,
+				userId: action.payload.userId,
+				name: action.payload.name,
 				active: true
 			});
 		},

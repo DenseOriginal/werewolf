@@ -43,6 +43,7 @@ wss.on('connection', (ws: WebSocketClient) => {
 					broadcastToRoom(roomId, {
 						type: 'userJoined',
 						userId: ws.userId,
+						name: content.name,
 					});
 				} else {
 					ws.send(JSON.stringify({ type: 'error', message: 'Room does not exist' }));
@@ -90,7 +91,7 @@ wss.on('connection', (ws: WebSocketClient) => {
 	ws.on('error', error => console.log('Error', error))
 });
 
-function broadcastToRoom(roomId: string, data: { type: string, userId: string | undefined, content?: unknown, users?: string[] }) {
+function broadcastToRoom(roomId: string, data: { type: string, userId: string | undefined, content?: unknown, users?: string[], name?: string }) {
 	const roomClients = rooms[roomId];
 	if (roomClients) {
 		roomClients.forEach((client) => {

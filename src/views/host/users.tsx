@@ -10,7 +10,7 @@ export const Users = () => {
 			<ul>
 				{users.map(user => (
 					<li key={user.userId} className="flex items-center gap-3">
-						<span>{user.userId}</span>
+						<span>{user.name}</span>
 						{!user.active && <i className="fa-solid fa-question text-red-500"></i>}
 					</li>
 				))}
