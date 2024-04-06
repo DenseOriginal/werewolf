@@ -63,6 +63,34 @@ const cupid: GenericCard<'cupid'> = {
 	score: -3
 }
 
+const wildcard1: GenericCard<'wildcard1'> = {
+	id: 'wildcard1',
+	name: 'Wildcard 1',
+	description: 'Wildcard 1',
+	score: 0
+}
+
+const wildcard2: GenericCard<'wildcard2'> = {
+	id: 'wildcard2',
+	name: 'Wildcard 2',
+	description: 'Wildcard 2',
+	score: 0
+}
+
+const wildcard3: GenericCard<'wildcard3'> = {
+	id: 'wildcard3',
+	name: 'Wildcard 3',
+	description: 'Wildcard 3',
+	score: 0
+}
+
+const wildcard4: GenericCard<'wildcard4'> = {
+	id: 'wildcard4',
+	name: 'Wildcard 4',
+	description: 'Wildcard 4',
+	score: 0
+}
+
 export const Cards = {
 	werewolf,
 	villager,
@@ -73,6 +101,10 @@ export const Cards = {
 	prince,
 	tanner,
 	cupid,
+	wildcard1,
+	wildcard2,
+	wildcard3,
+	wildcard4,
 }
 
 export const getCard = (id: string) => {
