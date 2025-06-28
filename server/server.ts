@@ -69,6 +69,16 @@ wss.on('connection', (ws: WebSocketClient) => {
 				}
 				break;
 
+			case 'leaveRoom':
+				if (ws.roomId && ws.userId) {
+					rooms[ws.roomId] = rooms[ws.roomId].filter((client) => client !== ws);
+					broadcastToRoom(ws.roomId, {
+						type: 'userLeft',
+						userId: ws.userId,
+					});
+				}
+				break;
+
 			case 'sendMessage':
 				if (ws.roomId && ws.userId) {
 					broadcastToRoom(ws.roomId, {

@@ -1,22 +1,40 @@
 import { Card } from "@/components/card";
 import Spinner from "@/components/spinner";
 import { classNames } from "@/stdlib/layout";
-import { useSelector } from "@/store"
+import { useDispatch, useSelector } from "@/store"
+import { leaveGame } from "@/store/player/thunks";
+import { useCallback } from "react";
 
 export const PlayerView = () => {
+	const dispatch = useDispatch();
 	const playerState = useSelector(state => state.player.state);
 	const gamePin = useSelector(state => state.player.gamePin);
 	const card = useSelector(state => state.player.card);
 
+	const leaveGameHandler = useCallback(() => {
+		dispatch(leaveGame());
+	}, [dispatch])
+
 	return playerState == 'playing' ? (
 		<div className="flex flex-col justify-center items-center h-full p-3">
-			<span
-				className={classNames(
-					'bg-yellow-200 noisy',
-					'border-amber-500 border-2 border-t-0 text-gray-950 text-lg text-center rounded-b px-3',
-					'absolute top-0 left-4',
-				)}
-			>{gamePin}</span>
+			<div className={classNames('absolute top-0 left-4 flex gap-2')}>
+				<span
+					className={classNames(
+						'bg-yellow-100 noisy',
+						'border-amber-500 border-2 border-t-0 text-gray-950 text-lg text-center rounded-b px-3',
+					)}
+				>{gamePin}</span>
+
+				<button
+					className={classNames(
+						'bg-yellow-100 active:bg-yellow-200 noisy',
+						'border-amber-500 border-2 border-t-0 text-gray-950 text-lg text-center rounded-b px-1.5',
+					)}
+					onClick={leaveGameHandler}
+				><i className="fa-solid fa-xmark"></i>
+				</button>
+			</div>
+
 			<div className="w-[300px] h-[415px] relative">
 				<Placeholder hide={card != 'unknown'} />
 				{card != 'unknown' && <Card card={card} />}

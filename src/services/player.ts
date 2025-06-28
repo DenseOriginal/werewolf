@@ -90,6 +90,15 @@ export class PlayerService {
 		}
 	}
 
+	public leaveGame() {
+		if (!this.gamePin) {
+			console.error('No game to leave');
+			return;
+		}
+
+		this.sendMessage('leaveRoom', {});
+	}
+
 	private onMessage = (message: HostMessage) => {
 		console.log("onMessage", message);
 
