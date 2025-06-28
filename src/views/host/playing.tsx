@@ -1,5 +1,6 @@
 import { Button } from "@/components/button"
 import { Hr } from "@/components/hr";
+import { getCard } from "@/services/cards/list";
 import { useDispatch, useSelector } from "@/store";
 import { resetGame } from "@/store/host/thunks";
 
@@ -23,7 +24,7 @@ export const PlayingView = () => {
 			<ul>
 				{Object.entries(dealtCards).map(entry => (
 					<li>
-						{getUsername(entry[0]) || 'Uknown'} - {entry[1]}
+						{getUsername(entry[0]) || 'Uknown'} - {getCard(entry[1]).name}
 					</li>
 				))}
 			</ul>
