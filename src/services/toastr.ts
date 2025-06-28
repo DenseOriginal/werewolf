@@ -1,7 +1,7 @@
 export interface ToastrItem {
-	type: 'info' | 'error';
+	type: 'info' | 'warn' | 'error';
 	title: string;
-	message: string;
+	message?: string;
 	id: string;
 }
 
@@ -22,7 +22,7 @@ export class Toastr {
 	private queue: ToastrItem[] = [];
 	private constructor() { }
 
-	private pushToQueue = (type: ToastrItem['type']) => (title: string, message: string) => {
+	private pushToQueue = (type: ToastrItem['type']) => (title: string, message?: string) => {
 		const toast: ToastrItem = { type, title, message, id: Math.random().toString() };
 		this.queue.push(toast);
 		this.processQueue();
@@ -47,5 +47,6 @@ export class Toastr {
 	}
 
 	public static info = Toastr.instance.pushToQueue('info');
+	public static warn = Toastr.instance.pushToQueue('warn');
 	public static error = Toastr.instance.pushToQueue('error');
 }

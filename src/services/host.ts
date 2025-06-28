@@ -5,6 +5,7 @@ import { PeerMessage } from "@/types";
 import { PlayerMessages } from "./player";
 import { getWsClient } from "./ws";
 import { HostState } from "@/store/types";
+import { Toastr } from "./toastr";
 
 export class HostService {
 	private static _instancte: HostService;
@@ -87,10 +88,12 @@ export class HostService {
 					return this.onMessage(message.userId, message.content);
 				case 'userJoined':
 					console.log('userJoined', message.userId);
+					Toastr.info(`${message.name} has joined the lobby`);
 					this.sendToUser(message.userId, welcomeUser(message.userId));
 					return store.dispatch(hostActions.addUser({ name: message.name, userId: message.userId }));
 				case 'userLeft':
 					console.log('userLeft', message.userId);
+					Toastr.warn(`${message.name} has left the lobby`)
 					return store.dispatch(hostActions.updateUserStatus({
 						userId: message.userId,
 						active: false

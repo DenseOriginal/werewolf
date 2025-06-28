@@ -11,6 +11,7 @@ const wss = new WebSocketServer({ server });
 
 interface WebSocketClient extends WebSocket {
 	userId?: string;
+	userName?: string;
 	roomId?: string;
 }
 
@@ -58,6 +59,7 @@ wss.on('connection', (ws: WebSocketClient) => {
 				if (rooms[roomId]) {
 					ws.roomId = roomId;
 					ws.userId = userId;
+					ws.userName = content.name;
 					rooms[roomId].push(ws);
 					broadcastToRoom(roomId, {
 						type: 'userJoined',
@@ -70,13 +72,7 @@ wss.on('connection', (ws: WebSocketClient) => {
 				break;
 
 			case 'leaveRoom':
-				if (ws.roomId && ws.userId) {
-					rooms[ws.roomId] = rooms[ws.roomId].filter((client) => client !== ws);
-					broadcastToRoom(ws.roomId, {
-						type: 'userLeft',
-						userId: ws.userId,
-					});
-				}
+				emitUserLeftEvent(ws);
 				break;
 
 			case 'sendMessage':
@@ -107,14 +103,7 @@ wss.on('connection', (ws: WebSocketClient) => {
 
 	ws.on('close', () => {
 		console.log('Client disconnected', { userId: ws.userId, roomId: ws.roomId });
-		
-		if (ws.roomId && ws.userId) {
-			rooms[ws.roomId] = rooms[ws.roomId].filter((client) => client !== ws);
-			broadcastToRoom(ws.roomId, {
-				type: 'userLeft',
-				userId: ws.userId,
-			});
-		}
+		emitUserLeftEvent(ws);
 	});
 
 	ws.on('error', error => console.log('Error', error))
@@ -142,6 +131,17 @@ function sendPrivateMessage(roomId: string, userId: string, data: unknown) {
 		if (client.readyState === WebSocket.OPEN) {
 			client.send(JSON.stringify(data));
 		}
+	}
+}
+
+function emitUserLeftEvent(ws: WebSocketClient) {
+	if (ws.roomId && ws.userId) {
+		rooms[ws.roomId] = rooms[ws.roomId].filter((client) => client !== ws);
+		broadcastToRoom(ws.roomId, {
+			type: 'userLeft',
+			userId: ws.userId,
+			name: ws.userName,
+		});
 	}
 }
 

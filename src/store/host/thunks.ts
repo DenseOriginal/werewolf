@@ -5,6 +5,7 @@ import { hostActions } from "./reducer";
 import { State } from "../types";
 import { CardId } from "@/services/cards";
 import { shuffleArray } from "@/stdlib/arrays";
+import { Toastr } from "@/services/toastr";
 
 export const hostGame = () => async (dispatch: ThunkDispatch) => {
 	dispatch(viewActions.setView('host'));
@@ -19,6 +20,7 @@ export const startGame = () => async (dispatch: ThunkDispatch, getState: () => S
 	const activeUsers = users.filter(user => user.active);
 
 	if (shuffledCards.length < activeUsers.length) {
+		Toastr.error("Can't start game", "Not enough cards for all active users");
 		console.error("Not enough cards for all active users");
 		return;
 	}

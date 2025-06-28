@@ -23,7 +23,7 @@ export const PlayingView = () => {
 			<Hr leftAligned><p className="text-lg">Cards</p></Hr>
 			<ul>
 				{Object.entries(dealtCards).map(entry => (
-					<li>
+					<li key={entry[0]}>
 						{getUsername(entry[0]) || 'Uknown'} - {getCard(entry[1]).name}
 					</li>
 				))}

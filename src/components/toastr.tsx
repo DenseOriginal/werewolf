@@ -14,7 +14,10 @@ const ToastrImpl = () => {
 	}, []);
 
 	return (
-		<div className="absolute bottom-2 left-2 right-2 flex flex-col justify-end items-stretch gap-2">
+		<div className={classNames(
+			'absolute bottom-3 left-3 right-3 flex flex-col justify-end items-stretch gap-2',
+			'touch-none pointer-events-none'
+		)}>
 			{queue?.map((item) => <Item key={item.id} {...item} />)}
 		</div>
 	)
@@ -22,8 +25,9 @@ const ToastrImpl = () => {
 
 const getBgColor = (type: ToastrItem['type']) => {
 	switch (type) {
-		case 'error': return 'bg-red-600';
-		case 'info': return 'bg-blue-600';
+		case 'error': return classNames('border-red-600 bg-red-500');
+		case 'warn': return classNames('border-yellow-600 bg-yellow-500');
+		case 'info': return classNames('border-blue-600 bg-blue-500');
 	}
 }
 
@@ -31,12 +35,12 @@ const Item = (props: ToastrItem) => {
 	return (
 		<div
 			className={classNames(
-				'bg-opacity-60 rounded-lg shadow-lg p-4 flex flex-col transition-all',
+				'rounded-lg shadow-lg py-2 px-3 border-2 flex flex-col transition-all',
 				getBgColor(props.type),
 			)}
 		>
-			<span>{props.title}</span>
-			<span>{props.message}</span>
+			<span className={classNames(props.message && "font-bold")}>{props.title}</span>
+			{props.message && <span>{props.message}</span>}
 		</div>
 	)
 }
