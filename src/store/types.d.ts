@@ -5,7 +5,7 @@ export interface ViewState {
 	view: 'home' | 'host' | 'player';
 }
 
-type GamePin = string;
+type GamePin = string | undefined;
 export interface HostState {
 	gamePin: GamePin;
 	users: User[];

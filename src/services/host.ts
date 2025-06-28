@@ -15,12 +15,11 @@ export class HostService {
 		return this._instancte;
 	}
 
-	private gamePin: string;
+	private gamePin?: string;
 	private userId: string;
 	private wsClient?: WebSocket;
 
 	private constructor() {
-		this.gamePin = Math.floor(Math.random() * 100000).toString().padEnd(5, "0");
 		this.userId = `host:${Math.floor(Math.random() * 100000).toString().padEnd(5, "0")}`;
 
 		store.subscribe(() => {
@@ -43,14 +42,8 @@ export class HostService {
 		this.wsClient.send(JSON.stringify(message));
 	}
 
-
-	public getGamePin(): string {
-		return this.gamePin;
-	}
-
 	public init() {
 		store.dispatch(hostActions.setState('creating'));
-		store.dispatch(hostActions.setGamePin(this.gamePin));
 
 		this.wsClient = getWsClient();
 		this.wsClient.onopen = () => {
@@ -70,7 +63,7 @@ export class HostService {
 
 		const patchedSettings: HostState = {
 			...hostInitialState,
-			gamePin: settings?.gamePin || this.gamePin,
+			gamePin: settings?.gamePin,
 			users: settings?.users || [],
 			game: {
 				cards: settings?.game?.cards || {},
@@ -105,6 +98,7 @@ export class HostService {
 
 				case 'roomCreated':
 					console.log('roomCreated', message);
+					store.dispatch(hostActions.setGamePin(message.newRoomId));
 					store.dispatch(hostActions.setState('settings'));
 					break;
 

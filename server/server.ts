@@ -27,17 +27,20 @@ wss.on('connection', (ws: WebSocketClient) => {
 
 		switch (type) {
 			case 'createRoom':
-				if (rooms[roomId]) {
+				const newRoomId = Math.floor(Math.random() * 100000).toString().padEnd(5, "0");
+				
+				if (rooms[newRoomId]) {
+					// If by all chance we generate a known id, just fail ¯\_(ツ)_/¯
 					ws.send(JSON.stringify({ type: 'error', message: 'Room already exists' }))
 				}
-				rooms[roomId] = [];
+				rooms[newRoomId] = [];
 
-				roomHostKeys[roomId] = Math.random().toString(36).substring(2);
+				roomHostKeys[newRoomId] = Math.random().toString(36).substring(2);
 
-				ws.roomId = roomId;
+				ws.roomId = newRoomId;
 				ws.userId = userId;
-				rooms[roomId].push(ws);
-				ws.send(JSON.stringify({ type: 'roomCreated', roomId }))
+				rooms[newRoomId].push(ws);
+				ws.send(JSON.stringify({ type: 'roomCreated', newRoomId }))
 				break;
 
 			case 'rejoinAsHost':
