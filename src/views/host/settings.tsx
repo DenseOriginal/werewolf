@@ -57,6 +57,10 @@ const CardOption = ({ cardId }: { cardId: CardId }) => {
 	}
 
 	const decrease = () => {
+		if (settings - 1 <= 0) {
+			return onRemove();
+		}
+
 		dispatch(hostActions.setCardCount({ cardId, count: settings - 1 }));
 	}
 
