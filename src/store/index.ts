@@ -5,12 +5,14 @@ import { viewReducer } from "./reducer";
 import { useSelector as reduxSelector, useDispatch as reduxDispatch } from "react-redux";
 import { ThunkDispatch as ReduxThunk } from "redux-thunk";
 import { State } from "./types";
+import { authReducer } from "./auth/reducer";
 
 export const store = configureStore<State>({
 	reducer: {
 		host: hostReducer,
 		player: playerReducer,
-		view: viewReducer
+		view: viewReducer,
+		auth: authReducer,
 	},
 })
 

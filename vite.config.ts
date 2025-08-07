@@ -17,6 +17,10 @@ export default defineConfig({
 				replacement: path.resolve(__dirname, "src/store")
 			},
 			{
+				find: "@/firebase",
+				replacement: path.resolve(__dirname, "src/firebase")
+			},
+			{
 				find: "@/services",
 				replacement: path.resolve(__dirname, "src/services")
 			},

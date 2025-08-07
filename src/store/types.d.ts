@@ -16,6 +16,10 @@ export interface HostState {
 	}
 }
 
+export interface AuthState {
+	authenticated: boolean;
+}
+
 export interface PlayerState {
 	state: 'joining' | 'playing';
 	gamePin: GamePin;
@@ -26,4 +30,5 @@ export interface State {
 	view: ViewState;
 	host: HostState;
 	player: PlayerState;
+	auth: AuthState;
 }

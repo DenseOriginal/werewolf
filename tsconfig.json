@@ -23,6 +23,7 @@
 	  "@/*": ["./src/*"],
 	  "@/stdlib/*": ["./src/stdlib/*"],
 	  "@/store/*": ["./src/store/*"],
+	  "@/firebase/*": ["./src/firebase/*"],
 	  "@/services/*": ["./src/services/*"],
 	  "@/components/*": ["./src/components/*"],
 	}
