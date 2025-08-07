@@ -6,7 +6,8 @@ import { AnyCard } from "@/services/cards/types";
 import { classNames } from "@/stdlib/layout";
 import { useDispatch, useSelector } from "@/store"
 import { hostActions } from "@/store/host/reducer";
-import { useMemo } from "react";
+import { syncSettingsWithDB } from "@/store/host/thunks";
+import { useEffect, useMemo } from "react";
 
 export const Settings = () => {
 	const dispatch = useDispatch();
@@ -21,6 +22,10 @@ export const Settings = () => {
 	const onSelect = (card: AnyCard) => {
 		dispatch(hostActions.addCard(card.id));
 	}
+
+	useEffect(() => {
+		dispatch(syncSettingsWithDB());
+	}, [selectedCards])
 
 	return <div>
 		<Hr leftAligned><p className="text-lg">Settings</p></Hr>
