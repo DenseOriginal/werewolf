@@ -1,7 +1,8 @@
+import { firestore } from "@/firebase/firestore";
 import { firebaseApp } from "@/firebase/init";
 import { CardId } from "@/services/cards";
 import { getAuth } from "firebase/auth";
-import { DocumentReference, QueryDocumentSnapshot, addDoc, collection, getDoc, getDocs, getFirestore, limit, query, updateDoc, where } from "firebase/firestore/lite";
+import { DocumentReference, QueryDocumentSnapshot, addDoc, collection, getDoc, getDocs, limit, query, updateDoc, where } from "firebase/firestore";
 
 export interface GameDataDB {
 	pin: string;
@@ -17,8 +18,7 @@ const gameDataConverter = {
 
 export const GAMES_REF_STRING = "games";
 const auth = getAuth(firebaseApp);
-const db = getFirestore(firebaseApp);
-export const gamesCollectionRef = collection(db, GAMES_REF_STRING).withConverter(gameDataConverter);
+export const gamesCollectionRef = collection(firestore, GAMES_REF_STRING).withConverter(gameDataConverter);
 
 async function createGame() {
 	const docRef = await addDoc(gamesCollectionRef, {

@@ -112,3 +112,4 @@ export const getCard = (id: string) => {
 }
 
 export type CardId = (typeof Cards)[keyof typeof Cards]['id'];
+export type CardIdOrNone = CardId | 'none';

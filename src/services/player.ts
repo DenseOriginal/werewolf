@@ -3,6 +3,8 @@ import { playerActions } from "@/store/player/reducer";
 import { GameRef, gamesDB } from "./firestore/games";
 import { viewActions } from "@/store/reducer";
 import { PlayerRef, playersDB } from "./firestore/players";
+import { setURLHash } from "@/stdlib/url";
+import { onSnapshot } from "firebase/firestore";
 
 export class PlayerService {
 	private static _instance?: PlayerService;
@@ -39,6 +41,35 @@ export class PlayerService {
 		this.playerDocRef = playerRef;		
 
 		store.dispatch(playerActions.setState('playing'));
+		setURLHash(game.data().pin);
+
+		this.setupPlayerListeners();
+	}
+
+	private setupPlayerListeners() {
+		if (!this.gameDocRef) {
+			throw new Error("Game not initialized, can't setup listeners");
+		}
+
+		if (!this.playerDocRef) {
+			throw new Error("Player not initialized, can't setup listeners");
+		}
+
+		onSnapshot(this.playerDocRef, (snapshot) => {
+			const playerData = snapshot.data();
+			
+			if (!playerData) {
+				console.error("Player data not found");
+				return;
+			}
+
+			if (!playerData.role) {
+				store.dispatch(playerActions.resetGame());
+				return;
+			} else {
+				store.dispatch(playerActions.setCard(playerData.role));
+			}
+		});
 	}
 
 	public leaveGame() {
@@ -46,6 +77,8 @@ export class PlayerService {
 			console.error('No game to leave');
 			return;
 		}
+
+		setURLHash("");
 	}
 }
 

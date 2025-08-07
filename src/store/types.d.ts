@@ -1,4 +1,5 @@
 import { CardId } from "@/services/cards";
+import { CardIdOrNone } from "@/services/cards/list";
 import { User } from "@/types";
 
 export interface ViewState {
@@ -23,7 +24,7 @@ export interface AuthState {
 export interface PlayerState {
 	state: 'joining' | 'playing';
 	gamePin: GamePin;
-	card: 'unknown' | CardId;
+	card: CardIdOrNone;
 }
 
 export interface State {

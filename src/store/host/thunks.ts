@@ -17,21 +17,20 @@ export const startGame = () => async (dispatch: ThunkDispatch, getState: () => S
 	const { game: { cards: settings }, users } = hostState;
 	const cardArray = Object.entries(settings).flatMap(([cardId, count]) => Array(count).fill(cardId) as CardId[]);
 	const shuffledCards = shuffleArray(cardArray);
-	const activeUsers = users.filter(user => user.active);
 
-	if (shuffledCards.length < activeUsers.length) {
+	if (shuffledCards.length < users.length) {
 		Toastr.error("Can't start game", "Not enough cards for all active users");
 		console.error("Not enough cards for all active users");
 		return;
 	}
 
-	const dealtCards = activeUsers
+	const dealtCards = users
 		.reduce((acc, user, idx) => ({
 			...acc,
 			[user.userId]: shuffledCards[idx % shuffledCards.length]
 		}), {} as Record<string, CardId>);
 
-	HostService.instance.startGame(dealtCards);
+	await HostService.instance.dealCards(dealtCards);
 	
 	dispatch(hostActions.setState('playing'));
 	dispatch(hostActions.setUserCards(dealtCards));

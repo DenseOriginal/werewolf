@@ -4,7 +4,7 @@ import { PlayerState } from "../types";
 const initialState: PlayerState = {
 	state: 'joining',
 	gamePin: '',
-	card: 'unknown'
+	card: 'none'
 }
 
 const playeSlice = createSlice({
@@ -18,7 +18,7 @@ const playeSlice = createSlice({
 			state.card = action.payload;
 		},
 		resetGame: (state) => {
-			state.card = 'unknown';
+			state.card = 'none';
 		},
 		setState: (state, action: PayloadAction<PlayerState['state']>) => {
 			state.state = action.payload;

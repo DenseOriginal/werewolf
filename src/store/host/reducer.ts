@@ -24,7 +24,6 @@ const hostSlice = createSlice({
 			// If the user is already in the list, update their status
 			const user = state.users.find(user => user.userId === action.payload.userId);
 			if (user) {
-				user.active = true;
 				user.name = action.payload.name;
 				return;
 			}
@@ -32,22 +31,8 @@ const hostSlice = createSlice({
 			// Otherwise, add a new user
 			state.users.push({
 				userId: action.payload.userId,
-				name: action.payload.name,
-				active: true
+				name: action.payload.name
 			});
-		},
-		setUsers: (state, action: PayloadAction<string[]>) => {
-			state.users = action.payload.map(userId => ({
-				userId,
-				name: '',
-				active: true
-			}));
-		},
-		updateUserStatus: (state, action: PayloadAction<{ userId: string, active: boolean }>) => {
-			const user = state.users.find(user => user.userId === action.payload.userId);
-			if (user) {
-				user.active = action.payload.active;
-			}
 		},
 		setState: (state, action: PayloadAction<HostState['state']>) => {
 			state.state = action.payload;

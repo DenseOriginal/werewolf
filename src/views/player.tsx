@@ -36,11 +36,11 @@ export const PlayerView = () => {
 			</div>
 
 			<div className="w-[300px] h-[415px] relative">
-				<Placeholder hide={card != 'unknown'} />
-				{card != 'unknown' && <Card card={card} />}
+				<Placeholder hide={card != 'none'} />
+				{card != 'none' && <Card card={card} />}
 			</div>
-			{card != 'unknown' && <p className="text-xl mt-4">Click to reveal</p>}
-			{card == 'unknown' && <p className="text-xl mt-4">Waiting for your card</p>}
+			{card != 'none' && <p className="text-xl mt-4">Click to reveal</p>}
+			{card == 'none' && <p className="text-xl mt-4">Waiting for your card</p>}
 		</div>
 	) : <LoadingView />
 }
