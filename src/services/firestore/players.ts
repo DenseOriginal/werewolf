@@ -3,7 +3,6 @@ import { getAuth } from "firebase/auth";
 import { DocumentReference, QueryDocumentSnapshot, collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { GAMES_REF_STRING, GameRef } from "./games";
 import { firestore } from "@/firebase/firestore";
-import { CardId } from "../cards";
 import { CardIdOrNone } from "../cards/list";
 
 export interface PlayerDataDB {
