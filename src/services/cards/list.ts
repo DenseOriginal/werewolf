@@ -91,6 +91,13 @@ const wildcard4: GenericCard<'wildcard4'> = {
 	score: 0
 }
 
+const wildcard5: GenericCard<'wildcard5'> = {
+	id: 'wildcard5',
+	name: 'Wildcard 5',
+	description: 'Wildcard 5',
+	score: 0
+}
+
 export const Cards = {
 	werewolf,
 	villager,
@@ -105,6 +112,7 @@ export const Cards = {
 	wildcard2,
 	wildcard3,
 	wildcard4,
+	wildcard5,
 }
 
 export const getCard = (id: string) => {
