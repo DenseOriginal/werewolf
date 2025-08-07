@@ -1,15 +1,8 @@
-import { HostMessage } from "./host";
 import { store } from "@/store";
 import { playerActions } from "@/store/player/reducer";
-import { PeerMessage } from "@/types";
-import { getWsClient } from "./ws";
+import { GameRef, gamesDB } from "./firestore/games";
 import { viewActions } from "@/store/reducer";
-import { Toastr } from "./toastr";
-
-interface UserSettings {
-	userId: string;
-	name: string;
-}
+import { PlayerRef, playersDB } from "./firestore/players";
 
 export class PlayerService {
 	private static _instance?: PlayerService;
@@ -19,110 +12,42 @@ export class PlayerService {
 		}
 		return this._instance;
 	}
+	
 	public static destroy() {
 		this._instance = undefined;
 	}
 
-	private wsClient?: WebSocket;
-	private gamePin?: string;
-	private settings: UserSettings;
+	private gameDocRef?: GameRef;
+	private playerDocRef?: PlayerRef;
 
-	private constructor() {
-		this.settings = this.getUserSettings();
-	}
+	private constructor() { }
 
-	private getUserSettings = () => {
-		const rawSettings = localStorage.getItem("userSettings") || "{}";
-		const settings: Partial<UserSettings> = JSON.parse(rawSettings);
-
-		const patchedSettings: UserSettings = {
-			userId: `user:${Math.floor(Math.random() * 100000)}`,
-			name: settings.name || fixedPrompt("Please enter your name"),
-			...settings,
-		}
-
-		localStorage.setItem("userSettings", JSON.stringify(patchedSettings));
-		return patchedSettings;
-	}
-
-	private sendMessage = (type: string, content: unknown) => {
-		if (!this.wsClient) {
-			return;
-		}
-		const message = {
-			userId: this.settings.userId,
-			roomId: this.gamePin,
-			type,
-			content
-		}
-		this.wsClient.send(JSON.stringify(message));
-	}
-
-	public connect(gamePin: string) {
-		this.gamePin = gamePin;
-
+	public async connect(gamePin: string) {
 		store.dispatch(playerActions.setState('joining'));
 
-		this.wsClient = getWsClient();
-		this.wsClient.onopen = () => {
-			this.sendMessage('joinRoom', { name: this.settings.name });
+		const game = await gamesDB.getGameByPin(gamePin);
+		
+		if (!game) {
+			store.dispatch(viewActions.setView('home'));
+			return;
 		}
+		
+		this.gameDocRef = game.ref;
 
-		this.wsClient.onmessage = (event) => {
-			const message = JSON.parse(event.data);
-			if (!['roomInfo', 'userJoined', 'message', 'unknownRoom'].includes(message?.type)) {
-				return console.error("Invalid message", message);
-			}
+		const friendlyName = fixedPrompt("Choose a player name:");
+		const playerRef = await playersDB.createPlayerInGame(game.ref, friendlyName)
+		this.playerDocRef = playerRef;		
 
-			switch (message.type) {
-				case 'message':
-					return this.onMessage(message.content);
-				case 'unknownRoom':
-					store.dispatch(viewActions.setView('home'));
-					Toastr.error("Unknown room", "The room you are trying to join does not exist");
-					return PlayerService.destroy();
-					
-				default:
-					console.log("Unhandled message :)", message);
-					break;
-			}
-
-		}
+		store.dispatch(playerActions.setState('playing'));
 	}
 
 	public leaveGame() {
-		if (!this.gamePin) {
+		if (!this.gameDocRef) {
 			console.error('No game to leave');
 			return;
 		}
-
-		this.sendMessage('leaveRoom', {});
-	}
-
-	private onMessage = (message: HostMessage) => {
-		console.log("onMessage", message);
-
-		switch (message?.type) {
-			case 'SET_CARD':
-				return store.dispatch(playerActions.setCard(message.data.card));
-			case 'RESET_GAME':
-				return store.dispatch(playerActions.resetGame());
-			case 'WELCOME':
-				if (message.data.userId == this.settings.userId) {
-					return store.dispatch(playerActions.setState('playing'));
-				}
-		}
 	}
 }
-
-const ping = (): PeerMessage<'PING', never> => ({
-	type: 'PING',
-	data: {} as never,
-});
-
-type MessageCreators =
-	| typeof ping;
-export type PlayerMessages = ReturnType<MessageCreators>;
 
 const fixedPrompt = (message: string) => {
 	let response = prompt(message);

@@ -1,7 +1,7 @@
 import { firebaseApp } from "@/firebase/init";
 import { CardId } from "@/services/cards";
 import { getAuth } from "firebase/auth";
-import { DocumentReference, QueryDocumentSnapshot, addDoc, collection, getDoc, getFirestore, updateDoc } from "firebase/firestore/lite";
+import { DocumentReference, QueryDocumentSnapshot, addDoc, collection, getDoc, getDocs, getFirestore, limit, query, updateDoc, where } from "firebase/firestore/lite";
 
 export interface GameDataDB {
 	pin: string;
@@ -15,9 +15,10 @@ const gameDataConverter = {
 	fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as GameDataDB
 }
 
+export const GAMES_REF_STRING = "games";
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
-export const gamesCollectionRef = collection(db, "games").withConverter(gameDataConverter);
+export const gamesCollectionRef = collection(db, GAMES_REF_STRING).withConverter(gameDataConverter);
 
 async function createGame() {
 	const docRef = await addDoc(gamesCollectionRef, {
@@ -38,9 +39,22 @@ async function updateGame(ref: GameRef, update: Partial<GameDataDB>) {
 	await updateDoc(ref, update);
 }
 
+async function getGameByPin(pin: string) {
+	const pinQuery = query(gamesCollectionRef, where("pin", "==", pin), limit(1));
+	const querySnapshot = await getDocs(pinQuery);
+	const game = querySnapshot.docs[0];
+
+	if (!game) {
+		return;
+	}
+
+	return game;
+}
+
 export const gamesDB = {
 	createGame,
 	getGameByRef,
-	updateGame
+	updateGame,
+	getGameByPin
 }
 
