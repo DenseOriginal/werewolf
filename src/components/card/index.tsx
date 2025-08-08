@@ -12,7 +12,7 @@ export const Card = (props: Props) => {
 	const [isStable, setIsStable] = useState(false);
 	const [open, setOpen] = useState(false);
 	const card = useMemo(() => getCard(props.card), [props.card]);
-	
+
 	return (
 		<div
 			className={classNames(
@@ -27,10 +27,14 @@ export const Card = (props: Props) => {
 			role="button"
 		>
 			<div className="front"></div>
-			<div className="back flex flex-col justify-center items-center text-black p-2">
-				<h1 className="text-3xl text-center">{card.name}</h1>
-				<p className="text-center">{card.description}</p>
-				{/* <img src="/src/assets/werewolf.png" alt="" /> */}
+			<div className="back flex flex-col justify-center items-center text-black overflow-hidden border-[12px] border-[#efe2d1]">
+				{!card.hasImage && <>
+					<h1 className="text-3xl text-center">{card.name}</h1>
+					<p className="text-center">{card.description}</p>
+				</>}
+				{card.hasImage && (
+					<img src={`/src/assets/faces/${card.id}.webp`} className="absolute bottom-0" alt="" />
+				)}
 			</div>
 		</div>
 	)

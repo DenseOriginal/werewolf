@@ -4,14 +4,16 @@ const werewolf: GenericCard<'werewolf'> = {
 	id: 'werewolf',
 	name: 'Werewolf',
 	description: 'Eat a villager each night.',
-	score: -6
+	score: -6,
+	hasImage: true,
 }
 
 const villager: GenericCard<'villager'> = {
 	id: 'villager',
 	name: 'Villager',
 	description: 'Find the werewolves and lynch them.',
-	score: 1
+	score: 1,
+	hasImage: true,
 }
 
 const privateInvestigator: GenericCard<'privateInvestigator'> = {
@@ -25,7 +27,8 @@ const seer: GenericCard<'seer'> = {
 	id: 'seer',
 	name: 'Seer',
 	description: 'Inspect a player each night.',
-	score: 7
+	score: 7,
+	hasImage: true,
 }
 
 const spellcaster: GenericCard<'spellcaster'> = {
@@ -39,7 +42,8 @@ const witch: GenericCard<'witch'> = {
 	id: 'witch',
 	name: 'Witch',
 	description: 'Kill or heal a player, once each per game.',
-	score: 4
+	score: 4,
+	hasImage: true,
 }
 
 const prince: GenericCard<'prince'> = {
@@ -60,7 +64,16 @@ const cupid: GenericCard<'cupid'> = {
 	id: 'cupid',
 	name: 'Cupid',
 	description: 'Choose two players to be lovers. If one of those players dies, the other dies from a broken heart.',
-	score: -3
+	score: -3,
+	hasImage: true,
+}
+
+const hunter: GenericCard<'hunter'> = {
+	id: 'hunter',
+	name: 'Hunter',
+	description: 'If you are killed, take someone down with you.',
+	score: -3,
+	hasImage: true,
 }
 
 const wildcard1: GenericCard<'wildcard1'> = {
@@ -108,6 +121,7 @@ export const Cards = {
 	prince,
 	tanner,
 	cupid,
+	hunter,
 	wildcard1,
 	wildcard2,
 	wildcard3,
