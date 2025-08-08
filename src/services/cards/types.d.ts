@@ -5,7 +5,7 @@ export interface GenericCard<T extends string> {
 	name: string;
 	description: string;
 	score: number;
-	hasImage?: boolean;
+	imagePath?: string;
 }
 
 export type AnyCard = GenericCard<CardId>;

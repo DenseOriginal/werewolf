@@ -26,6 +26,7 @@
 	  "@/firebase/*": ["./src/firebase/*"],
 	  "@/services/*": ["./src/services/*"],
 	  "@/components/*": ["./src/components/*"],
+	  "@/assets/*": ["./src/assets/*"],
 	}
   },
   "include": ["src"],

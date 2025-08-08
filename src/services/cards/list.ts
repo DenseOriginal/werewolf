@@ -1,11 +1,17 @@
 import { GenericCard } from "./types";
+import werewolfImgUrl from "@/assets/faces/werewolf.webp";
+import villagerImgUrl from "@/assets/faces/villager.webp";
+import seerImgUrl from "@/assets/faces/seer.webp";
+import witchImgUrl from "@/assets/faces/witch.webp";
+import cupidImgUrl from "@/assets/faces/cupid.webp";
+import hunterImgUrl from "@/assets/faces/hunter.webp";
 
 const werewolf: GenericCard<'werewolf'> = {
 	id: 'werewolf',
 	name: 'Werewolf',
 	description: 'Eat a villager each night.',
 	score: -6,
-	hasImage: true,
+	imagePath: werewolfImgUrl,
 }
 
 const villager: GenericCard<'villager'> = {
@@ -13,7 +19,7 @@ const villager: GenericCard<'villager'> = {
 	name: 'Villager',
 	description: 'Find the werewolves and lynch them.',
 	score: 1,
-	hasImage: true,
+	imagePath: villagerImgUrl,
 }
 
 const privateInvestigator: GenericCard<'privateInvestigator'> = {
@@ -28,7 +34,7 @@ const seer: GenericCard<'seer'> = {
 	name: 'Seer',
 	description: 'Inspect a player each night.',
 	score: 7,
-	hasImage: true,
+	imagePath: seerImgUrl,
 }
 
 const spellcaster: GenericCard<'spellcaster'> = {
@@ -43,7 +49,7 @@ const witch: GenericCard<'witch'> = {
 	name: 'Witch',
 	description: 'Kill or heal a player, once each per game.',
 	score: 4,
-	hasImage: true,
+	imagePath: witchImgUrl,
 }
 
 const prince: GenericCard<'prince'> = {
@@ -65,7 +71,7 @@ const cupid: GenericCard<'cupid'> = {
 	name: 'Cupid',
 	description: 'Choose two players to be lovers. If one of those players dies, the other dies from a broken heart.',
 	score: -3,
-	hasImage: true,
+	imagePath: cupidImgUrl,
 }
 
 const hunter: GenericCard<'hunter'> = {
@@ -73,7 +79,7 @@ const hunter: GenericCard<'hunter'> = {
 	name: 'Hunter',
 	description: 'If you are killed, take someone down with you.',
 	score: -3,
-	hasImage: true,
+	imagePath: hunterImgUrl,
 }
 
 const wildcard1: GenericCard<'wildcard1'> = {
