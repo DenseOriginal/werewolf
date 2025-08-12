@@ -6,6 +6,10 @@ import { Toastr } from "./toastr";
 import { GameDataDB, GameRef, gamesDB } from "./firestore/games";
 import { playersDB } from "./firestore/players";
 import { router } from "./router";
+import { getAuth } from "firebase/auth";
+import { firebaseApp } from "@/firebase/init";
+
+const auth = getAuth(firebaseApp);
 
 export class HostService {
 	private static _instance: HostService;
@@ -48,6 +52,12 @@ export class HostService {
 		this.gameDocRef = gameRef.ref;
 
 		const gameData = gameRef.data();
+
+		if (gameData.host != auth.currentUser?.uid) {
+			Toastr.error("You are not the host of this game", "Please check the PIN and try again.");
+			router.navigate('/');
+			return;
+		}
 
 		store.dispatch(hostActions.setGamePin(gameData.pin));
 		store.dispatch(hostActions.setState(gameData.state));
