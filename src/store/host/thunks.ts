@@ -1,4 +1,3 @@
-import { viewActions } from "../reducer";
 import { ThunkDispatch } from "@/store";
 import { HostService } from "@/services/host";
 import { hostActions } from "./reducer";
@@ -7,8 +6,7 @@ import { CardId } from "@/services/cards";
 import { shuffleArray } from "@/stdlib/arrays";
 import { Toastr } from "@/services/toastr";
 
-export const hostGame = () => async (dispatch: ThunkDispatch) => {
-	dispatch(viewActions.setView('host'));
+export const hostGame = () => async () => {
 	HostService.instance.createGameAndRedirect();
 }
 

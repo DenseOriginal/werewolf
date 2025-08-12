@@ -11,9 +11,8 @@ import {
 import { router } from "./services/router";
 
 const stateSelector = createSelector(
-	(state: State) => state.view.view,
 	(state: State) => state.auth.authenticated,
-	(view, authenticated) => ({ view, authenticated })
+	(authenticated) => ({ authenticated })
 )
 
 function App() {

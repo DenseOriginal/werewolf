@@ -2,10 +2,6 @@ import { CardId } from "@/services/cards";
 import { CardIdOrNone } from "@/services/cards/list";
 import { User } from "@/types";
 
-export interface ViewState {
-	view: 'home' | 'host' | 'player';
-}
-
 type GamePin = string | undefined;
 export interface HostState {
 	gamePin: GamePin;
@@ -28,7 +24,6 @@ export interface PlayerState {
 }
 
 export interface State {
-	view: ViewState;
 	host: HostState;
 	player: PlayerState;
 	auth: AuthState;

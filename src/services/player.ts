@@ -1,13 +1,13 @@
 import { store } from "@/store";
 import { playerActions } from "@/store/player/reducer";
 import { GameRef, gamesDB } from "./firestore/games";
-import { viewActions } from "@/store/reducer";
 import { PlayerRef, playersDB } from "./firestore/players";
 import { Unsubscribe, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { firebaseApp } from "@/firebase/init";
 import { onKicked } from "@/store/player/thunks";
 import { Toastr } from "./toastr";
+import { router } from "./router";
 
 const auth = getAuth(firebaseApp);
 
@@ -35,7 +35,8 @@ export class PlayerService {
 		const game = await gamesDB.getGameByPin(gamePin);
 		
 		if (!game) {
-			store.dispatch(viewActions.setView('home'));
+			Toastr.error("Game not found", "Please check the PIN and try again.");
+			router.navigate('/');
 			return;
 		}
 		
