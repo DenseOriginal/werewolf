@@ -34,6 +34,9 @@ const hostSlice = createSlice({
 				name: action.payload.name
 			});
 		},
+		removeUser: (state, action: PayloadAction<string>) => {
+			state.users = state.users.filter(user => user.userId !== action.payload);
+		},
 		setState: (state, action: PayloadAction<HostState['state']>) => {
 			state.state = action.payload;
 		},

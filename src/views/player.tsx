@@ -2,14 +2,24 @@ import { Card } from "@/components/card";
 import Spinner from "@/components/spinner";
 import { classNames } from "@/stdlib/layout";
 import { useDispatch, useSelector } from "@/store"
-import { leaveGame } from "@/store/player/thunks";
-import { useCallback } from "react";
+import { connectToGame, leaveGame } from "@/store/player/thunks";
+import { useCallback, useEffect } from "react";
+import { useParams } from "react-router";
 
 export const PlayerView = () => {
+	const params = useParams<'roomId'>();
 	const dispatch = useDispatch();
 	const playerState = useSelector(state => state.player.state);
 	const gamePin = useSelector(state => state.player.gamePin);
 	const card = useSelector(state => state.player.card);
+
+	useEffect(() => {
+		if (!params.roomId) {
+			return;
+		}
+
+		dispatch(connectToGame(params.roomId));
+	}, [dispatch]);
 
 	const leaveGameHandler = useCallback(() => {
 		dispatch(leaveGame());

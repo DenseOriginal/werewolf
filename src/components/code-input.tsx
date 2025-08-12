@@ -1,21 +1,17 @@
 import { useRef, useState } from "react";
 import { classNames } from "../stdlib/layout";
-import { connectToGame } from "@/store/player/thunks";
-import { useDispatch } from "@/store";
+
+interface Props {
+	onInput: (input: string) => void;
+}
 
 const codeLength = 5;
-export const CodeInput = () => {
-	const dispatch = useDispatch();
-	
+export const CodeInput = (props: Props) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const focusInput = () => {
 		inputRef.current?.focus();
-	}
-
-	const connect = (gamePin: string) => {
-		dispatch(connectToGame(gamePin))
 	}
 
 	const [code, setCode] = useState("");
@@ -26,7 +22,7 @@ export const CodeInput = () => {
 		}
 		setCode(value.toUpperCase());
 
-		if (value.length === codeLength) connect(value.toUpperCase());
+		if (value.length === codeLength) props.onInput(value.toUpperCase());
 	}
 
 	const Number = (props: { idx: number }) => {

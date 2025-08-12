@@ -1,6 +1,6 @@
 import { firebaseApp } from "@/firebase/init";
 import { getAuth } from "firebase/auth";
-import { DocumentReference, QueryDocumentSnapshot, collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import { DocumentReference, QueryDocumentSnapshot, collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { GAMES_REF_STRING, GameRef } from "./games";
 import { firestore } from "@/firebase/firestore";
 import { CardIdOrNone } from "../cards/list";
@@ -57,11 +57,27 @@ async function getPlayerList(gameRef: GameRef): Promise<PlayerDataDB[]> {
 	return snapshot.docs.map(doc => doc.data());
 }
 
+async function isPlayerInGame(gameRef: GameRef): Promise<boolean> {
+	if (!auth.currentUser) {
+		return false;
+	}
+	
+	const playerRef = getPlayerDocumentRef(gameRef, auth.currentUser.uid);
+	const snapshot = await getDoc(playerRef);
+	return snapshot.exists();
+}
+
+async function deletePlayer(playerRef: PlayerRef) {
+	await deleteDoc(playerRef);
+}
+
 export const playersDB = {
 	getPlayerCollection,
 	createPlayerInGame,
 	setPlayerCard,
 	getPlayerList,
-	getPlayerDocumentRef
+	getPlayerDocumentRef,
+	isPlayerInGame,
+	deletePlayer
 }
 

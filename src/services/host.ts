@@ -61,9 +61,7 @@ export class HostService {
 			throw new Error("Game not started yet, cant setup listeners");
 		}
 
-		if (this.gameListenerUnsubscribe) {
-			this.gameListenerUnsubscribe();
-		}
+		this.gameListenerUnsubscribe?.();
 
 		const playerCollectionRef = playersDB.getPlayerCollection(this.gameDocRef);
 		this.gameListenerUnsubscribe = onSnapshot(playerCollectionRef, (snapshot) => {
@@ -83,8 +81,23 @@ export class HostService {
 						}))
 					}
 				}
+
+				if (change.type == 'removed') {
+					Toastr.info(`${data.name} has left the room`);
+					store.dispatch(hostActions.removeUser(data.userId));
+				}
 			});
 		});
+	}
+
+	public async kickPlayer(id: string) {
+		if (!this.gameDocRef) {
+			console.error("No game started");
+			return;
+		}
+		
+		const playerRef = playersDB.getPlayerDocumentRef(this.gameDocRef, id);
+		await playersDB.deletePlayer(playerRef);
 	}
 
 	public async syncGameCards(cards: GameDataDB['cards']) {

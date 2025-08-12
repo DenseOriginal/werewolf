@@ -3,8 +3,13 @@ import { playerActions } from "@/store/player/reducer";
 import { GameRef, gamesDB } from "./firestore/games";
 import { viewActions } from "@/store/reducer";
 import { PlayerRef, playersDB } from "./firestore/players";
-import { setURLHash } from "@/stdlib/url";
-import { onSnapshot } from "firebase/firestore";
+import { Unsubscribe, onSnapshot } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { firebaseApp } from "@/firebase/init";
+import { onKicked } from "@/store/player/thunks";
+import { Toastr } from "./toastr";
+
+const auth = getAuth(firebaseApp);
 
 export class PlayerService {
 	private static _instance?: PlayerService;
@@ -36,17 +41,24 @@ export class PlayerService {
 		
 		this.gameDocRef = game.ref;
 
-		const friendlyName = fixedPrompt("Choose a player name:");
-		const playerRef = await playersDB.createPlayerInGame(game.ref, friendlyName)
-		this.playerDocRef = playerRef;		
+		const isPlayerInGame = await playersDB.isPlayerInGame(game.ref);
+		if (isPlayerInGame) {
+			this.playerDocRef = playersDB.getPlayerDocumentRef(game.ref, auth.currentUser!.uid);
+		} else {
+			const friendlyName = fixedPrompt("Choose a player name:");
+			const playerRef = await playersDB.createPlayerInGame(game.ref, friendlyName)
+			this.playerDocRef = playerRef;
+		}
 
 		store.dispatch(playerActions.setState('playing'));
-		setURLHash(game.data().pin);
 
 		this.setupPlayerListeners();
 	}
 
+	private playerListenerUnsubscribe?: Unsubscribe;
 	private setupPlayerListeners() {
+		this.playerListenerUnsubscribe?.();
+		
 		if (!this.gameDocRef) {
 			throw new Error("Game not initialized, can't setup listeners");
 		}
@@ -55,9 +67,15 @@ export class PlayerService {
 			throw new Error("Player not initialized, can't setup listeners");
 		}
 
-		onSnapshot(this.playerDocRef, (snapshot) => {
+		this.playerListenerUnsubscribe = onSnapshot(this.playerDocRef, (snapshot) => {
 			const playerData = snapshot.data();
 			
+			if (!snapshot.exists()) {
+				Toastr.warn("You have been kicked from the game");
+				this.playerListenerUnsubscribe?.();
+				return store.dispatch(onKicked());
+			}
+
 			if (!playerData) {
 				console.error("Player data not found");
 				return;
@@ -72,13 +90,14 @@ export class PlayerService {
 		});
 	}
 
-	public leaveGame() {
-		if (!this.gameDocRef) {
+	public async leaveGame() {
+		if (!this.playerDocRef) {
 			console.error('No game to leave');
 			return;
 		}
 
-		setURLHash("");
+		this.playerListenerUnsubscribe?.();
+		await playersDB.deletePlayer(this.playerDocRef);
 	}
 }
 
