@@ -5,20 +5,34 @@ import { Users } from "./users";
 import { Settings } from "./settings";
 import { startGame } from "@/store/host/thunks";
 import { PlayingView } from "./playing";
+import { useEffect, useMemo } from "react";
+import { useParams } from "react-router";
+import { HostService } from "@/services/host";
 
 export const HostView = () => {
+	const params = useParams<'roomId'>();
 	const state = useSelector(state => state.host.state);
 
-	const getView = () => {
+	useEffect(() => {
+		if (!params.roomId) {
+			console.error("No room ID provided in URL");
+			return;
+		}
+
+		console.log("Joining as host in room:", params.roomId);
+		HostService.instance.joinAsHost(params.roomId);
+	}, [params.roomId]);
+
+	const view = useMemo(() => {
 		switch (state) {
 			case 'settings': return <SettingsView />;
 			case 'creating': return <LoadingView />;
 			case 'playing': return <PlayingView />;
 			default: return <p>{"You should be here :("}  {state}</p>
 		}
-	}
+	}, [state]);
 
-	return <div className="h-full w-full overflow-y-auto p-3">{getView()}</div>;
+	return <div className="h-full w-full overflow-y-auto p-3">{view}</div>;
 }
 
 const SettingsView = () => {

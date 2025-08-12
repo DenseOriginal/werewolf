@@ -9,7 +9,7 @@ import { Toastr } from "@/services/toastr";
 
 export const hostGame = () => async (dispatch: ThunkDispatch) => {
 	dispatch(viewActions.setView('host'));
-	HostService.instance.createGame();
+	HostService.instance.createGameAndRedirect();
 }
 
 export const startGame = () => async (dispatch: ThunkDispatch, getState: () => State) => {
@@ -34,17 +34,22 @@ export const startGame = () => async (dispatch: ThunkDispatch, getState: () => S
 	
 	dispatch(hostActions.setState('playing'));
 	dispatch(hostActions.setUserCards(dealtCards));
+	dispatch(syncSettingsWithDB());
 }
 
 export const resetGame = () => async (dispatch: ThunkDispatch) => {
 	HostService.instance.resetGame();
 	dispatch(hostActions.setState('settings'));
 	dispatch(hostActions.setUserCards({}));
+	dispatch(syncSettingsWithDB());
 }
 
 export const syncSettingsWithDB = () => async (_: ThunkDispatch, getState: () => State) => {
 	const state = getState();
 	const hostService = HostService.instance;
 
-	hostService.updateCards(state.host.game.cards);
+	hostService.syncGameCards(state.host.game.cards);
+	if (state.host.state != 'creating') {
+		hostService.syncGameState(state.host.state);
+	}
 }

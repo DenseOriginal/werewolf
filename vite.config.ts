@@ -9,6 +9,10 @@ export default defineConfig({
 	resolve: {
 		alias: [
 			{
+				find: "@/views",
+				replacement: path.resolve(__dirname, "src/views")
+			},
+			{
 				find: "@/stdlib",
 				replacement: path.resolve(__dirname, "src/stdlib")
 			},

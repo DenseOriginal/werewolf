@@ -43,13 +43,20 @@ const hostSlice = createSlice({
 		addCard: (state, action: PayloadAction<CardId>) => {
 			state.game.cards[action.payload] = (state.game.cards[action.payload] || 0) + 1;
 		},
+		setCards: (state, action: PayloadAction<HostState['game']['cards']>) => {
+			state.game.cards = action.payload;
+		},
 		removeCard: (state, action: PayloadAction<CardId>) => {
 			delete state.game.cards[action.payload];
 		},
 		setUserCards: (state, action: PayloadAction<HostState['game']['userCards']>) => {
 			state.game.userCards = action.payload;
 		},
-		loadStateFromStorage: (state, action: PayloadAction<HostState>) => {
+		setUserCard: (state, action: PayloadAction<{ userId: string, cardId: CardId }>) => {
+			const { userId, cardId } = action.payload;
+			state.game.userCards[userId] = cardId;
+		},
+		loadStateFromStorage: (state, action: PayloadAction<Partial<HostState>>) => {
 			Object.assign(state, action.payload);
 		}
 	}

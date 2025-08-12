@@ -8,6 +8,7 @@ export interface GameDataDB {
 	pin: string;
 	host: string;
 	cards: Partial<Record<CardId, number>>;
+	state: "settings" | "playing";
 }
 export type GameRef = DocumentReference<GameDataDB, GameDataDB>;
 
@@ -24,7 +25,8 @@ async function createGame() {
 	const docRef = await addDoc(gamesCollectionRef, {
 		pin: Math.floor(Math.random() * 100000).toString().padEnd(5, "0"),
 		host: auth.currentUser?.uid ?? "",
-		cards: {}
+		cards: {},
+		state: "settings"
 	});
 
 	return docRef;
