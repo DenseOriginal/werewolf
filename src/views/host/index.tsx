@@ -5,9 +5,10 @@ import { Users } from "./users";
 import { Settings } from "./settings";
 import { startGame } from "@/store/host/thunks";
 import { PlayingView } from "./playing";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useParams } from "react-router";
 import { HostService } from "@/services/host";
+import { Toastr } from "@/services/toastr";
 
 export const HostView = () => {
 	const params = useParams<'roomId'>();
@@ -39,13 +40,26 @@ const SettingsView = () => {
 	const dispatch = useDispatch();
 	const gamePin = useSelector(state => state.host.gamePin);
 
-	const onStart = () => {
+	const onStart = useCallback(() => {
 		dispatch(startGame());
-	}
+	}, [dispatch]);
+
+	const copyToClipboard = useCallback(() => {
+		navigator.clipboard.writeText(`${location.origin}/${gamePin}`)
+			.then(() => {
+				Toastr.info("Game PIN copied to clipboard!");
+			})
+			.catch(err => {
+				console.error("Failed to copy game PIN:", err);
+				Toastr.error("Failed to copy game PIN. Please try again.");
+			});
+	}, [])
 
 	return (
 		<div className="flex flex-col items-stretch h-full">
-			<h1 className="text-xl text-center mb-5">Game pin: {gamePin}</h1>
+			<button onClick={copyToClipboard} className="mb-5">
+				<h1 className="text-xl text-center">Game pin: {gamePin}</h1>
+			</button>
 
 			<Users />
 			<Settings />
